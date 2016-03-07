@@ -1,0 +1,95 @@
+<ion-side-menus>
+  <ion-side-menu side="right">
+  
+    <ion-header-bar class="bar-stable">
+      <h1 class="title">Actions</h1>
+    </ion-header-bar>
+
+    <ion-content>
+      <ion-list>
+        <ion-item ng-click="Save()">Save</ion-item>
+        <ion-item ng-click="Load()">Load</ion-item>
+        <ion-item ng-click="ResetPosition()">Reset position</ion-item>
+        <ion-item ng-click="ResetRotation()">Reset rotation</ion-item>
+        <ion-item ng-click="ResetScale()">Reset scale</ion-item>
+      </ion-list>
+    </ion-content>
+
+  </ion-side-menu>
+
+  <ion-side-menu-content drag-content="false">
+
+
+
+    <ion-header-bar class="bar-positive">
+      <a class="button button-icon icon ion-ios-arrow-back" ui-sref="channel_edit( { channel_id: channel_id } )"></a>
+      <h1 class="title">Transform contents</h1>
+      <a class="button button-icon icon ion-navicon-round" menu-toggle="right"></a>
+    </ion-header-bar>
+
+
+    <ion-content scroll="false">
+
+      <div class="row" style="width:100%; height:50%; border:1px solid #aaaaaa;" channel-render
+      channel="{{channel_id}}" position="position" rotation="rotation" scale="scale.value" selection="selection">
+      </div
+
+
+      <div class="row" style="width:100%; height:50%;">
+        <ion-list ng-show="selection !== undefined">
+
+          <div class="item range range-positive" ng-show="show_tools_position">
+            x
+            <input type="range" min="-{{pos_extremum}}" max="{{pos_extremum}}"
+            step="0.001" ng-model="position.x">
+          </div>
+          <div class="item range range-positive" ng-show="show_tools_position">
+            y
+            <input type="range" min="-{{pos_extremum}}" max="{{pos_extremum}}"
+            step="0.001" ng-model="position.y">
+          </div>
+          <div class="item range range-positive" ng-show="show_tools_position">
+            z
+            <input type="range" min="{{posZ_min}}" max="{{posZ_max}}"
+            step="0.001" ng-model="position.z">
+          </div>
+
+          <div class="item range range-positive" ng-show="show_tools_rotation">
+            x
+            <input type="range" min="{{rot_min}}" max="{{rot_max}}"
+            step="0.001" ng-model="rotation.x">
+          </div>
+          <div class="item range range-positive" ng-show="show_tools_rotation">
+            y
+            <input type="range" min="{{rot_min}}" max="{{rot_max}}"
+            step="0.001" ng-model="rotation.y">
+          </div>
+          <div class="item range range-positive" ng-show="show_tools_rotation">
+            z
+            <input type="range" min="{{rot_min}}" max="{{rot_max}}"
+            step="0.001" ng-model="rotation.z">
+          </div>
+
+          <div class="item range range-positive" ng-show="show_tools_scale">
+            <input type="range" min="{{scale_min}}" max="{{scale_max}}"
+            step="0.001" ng-model="scale.value">
+          </div>
+
+        </ion-list>
+      </div>
+
+    </ion-content>
+
+
+    <ion-footer-bar class="bar-stable">
+      <a class="button button-icon icon ion-arrow-move" ng-click="ShowToolsPosition()"</a>
+      <a class="button button-icon icon ion-refresh" ng-click="ShowToolsRotation()"></a>
+      <a class="button button-icon icon ion-arrow-expand" ng-click="ShowToolsScale()"></a>
+      <h1 class="title">{{current_tool}}</h1>
+    </ion-footer-bar>
+
+
+
+  </ion-side-menu-content>
+
+</ion-side-menus>

@@ -1,0 +1,15 @@
+<ion-header-bar class="bar-positive">
+  <a class="button button-icon icon ion-ios-arrow-back" ng-click="Back()"></a>
+  <h1 class="title">Select marker</h1>
+</ion-header-bar>
+
+<ion-content>
+
+  <ion-list>
+    <ion-item class="item-thumbnail-left" ng-repeat="(uuid, marker) in container" ng-click="Select(uuid)">
+      <img ng-src="{{marker.img}}">
+      <h2>{{marker.name}}</h2>
+    </ion-item>
+  </ion-list>
+
+</ion-content>

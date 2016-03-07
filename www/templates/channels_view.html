@@ -1,0 +1,92 @@
+<ion-side-menus>
+  <ion-side-menu side="right">
+  
+    <ion-header-bar class="bar-positive">
+      <h1 class="title">Actions</h1>
+    </ion-header-bar>
+
+    <ion-content>
+      <ion-list>
+        <ion-item ng-click="SaveConfig()">Save channels</ion-item>
+        <ion-item ng-click="LoadConfig()">Load channels</ion-item>
+        <ion-item ng-click="LoadPreset()">Load presets</ion-item>
+        <ion-item ng-click="ShowDownloadModal()">Download assets</ion-item>
+        <!--ion-item ng-click="GetPicture()" ng-controller="CameraPictureCtrl">Add marker</ion-item-->
+      </ion-list>
+    </ion-content>
+
+  </ion-side-menu>
+
+
+  <ion-side-menu-content drag-content="false">
+
+
+    <ion-header-bar class="bar-balanced">
+      <a class="button button-icon icon ion-ios-arrow-back" ui-sref="tracking_view"></a>
+      <h1 class="title">Channels</h1>
+      <a class="button button-icon icon ion-navicon-round" menu-toggle="right"></a>
+    </ion-header-bar>
+
+    <ion-content>
+      <ion-list show-delete="show_delete">
+        <ion-item class="card" ng-repeat="(uuid, channel) in GetChannelContainer()"
+        ui-sref="channel_edit({channel_id: uuid})">
+
+          <ion-delete-button class="ion-minus-circled" ng-click="DeleteChannel(uuid)">
+          </ion-delete-button>
+
+          <a class="item item-thumbnail-left">
+            <img class="marker" ng-src="{{GetMarker(channel.marker).img}}" alt="{{channel.marker}}"/>
+            <h2>{{channel.name}}</h2>
+            <p ng-repeat="(index, contents) in channel.contents track by $index">
+              {{contents.name}}
+            </p>
+          </a>
+
+        </ion-item>
+      </ion-list>
+    </ion-content>
+
+    <ion-footer-bar class="bar-stable">
+      <a class="button button-icon icon ion-minus-circled" ng-click="show_delete = !show_delete;"/>
+      <a class="button button-icon icon ion-plus-circled" ng-click="CreateChannel()"/>
+    </ion-footer-bar>
+
+  </ion-side-menu-content>
+
+
+</ion-side-menus>
+
+<script id="download_modal" type="text/ng-template">
+  <ion-modal-view>
+    <ion-header-bar>
+      <a class="button button-icon icon ion-ios-arrow-back" ng-click="HideDownloadModal()"></a>
+      <h1 class="title">Download assets</h1>
+    </ion-header-bar>
+    <ion-content>
+      <ion-list>
+
+        <ion-item class="item-input-inset">
+        <span class="input-label">Marker</span>
+          <label class="item-input-wrapper">
+            <input type="text" placeholder="Enter name" ng-model="input.marker_name">
+          </label>
+          <button class="button button-small" ng-click="DownloadMarker()">
+            Download
+          </button>
+        </ion-item>
+
+        <ion-item class="item-input-inset">
+        <span class="input-label">Contents</span>
+          <label class="item-input-wrapper">
+            <input type="text" placeholder="Enter name" ng-model="input.contents_name">
+          </label>
+          <button class="button button-small" ng-click="DownloadContents()">
+            Download
+          </button>
+        </ion-item>
+
+      </ion-list>
+    </ion-content>
+  </ion-modal-view>
+</script>

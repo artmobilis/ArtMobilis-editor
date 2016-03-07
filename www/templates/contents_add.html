@@ -1,0 +1,22 @@
+<ion-header-bar class="bar-positive">
+  <a class="button button-icon icon ion-ios-arrow-back" ui-sref="channel_edit( { channel_id: channel_id } )"></a>
+  <h1 class="title">Select contents</h1>
+</ion-header-bar>
+
+<ion-content>
+  <ion-list>
+    <ion-item ng-repeat="(uuid, contents) in GetContentsContainer() track by $index"
+    ng-click="SelectContents(uuid)">
+
+      <table>
+        <tr style="vertical-align:middle">
+          <td><object-render object="{{contents.object}}"
+            width="75" height="75">
+            </object-render></td>
+          <td style="vertical-align:middle"> <h2>{{contents.name}}</h2> </td>
+        </tr>
+       </table>
+
+    </ion-item>
+  </ion-list>
+</ion-content>

@@ -1,0 +1,98 @@
+{
+  "constants": {
+    "asset_path": "./assets",
+    "image_path": "images",
+    "video_path": "videos",
+    "model_path": "models"
+  },
+  "object": {
+    "type": "Object3D",
+    "uuid": "root",
+    "children": [
+      {
+        "type": "Mesh",
+        "uuid": "mesh_cube",
+        "geometry": "geo_box",
+        "material": "mat_phong_red"
+      },
+      {
+        "type": "Mesh",
+        "uuid": "mesh_sphere",
+        "geometry": "geo_sphere",
+        "material": "mat_phong_blue"
+      },
+      {
+        "type": "Mesh",
+        "uuid": "mesh_plane",
+        "geometry": "geo_plane",
+        "material": "mat_phong_yellow"
+      },
+      {
+        "type": "Mesh",
+        "uuid": "mesh_lehublot",
+        "geometry": "geo_plane",
+        "material": "mat_lehublot"
+      }
+    ]
+  },
+  "geometries": [
+    {
+      "type": "BoxGeometry",
+      "uuid": "geo_box",
+      "width": 1,
+      "height": 1,
+      "depth": 1
+    },
+    {
+      "type": "PlaneGeometry",
+      "uuid": "geo_plane",
+      "width": 1,
+      "height": 1
+    },
+    {
+      "type": "SphereGeometry",
+      "uuid": "geo_sphere",
+      "radius": 1,
+      "widthSegments": 20,
+      "heightSegments": 11
+    }
+  ],
+  "materials": [
+    {
+      "type": "MeshPhongMaterial",
+      "uuid": "mat_phong_blue",
+      "color": "0x0D6CFA"
+    },
+    {
+      "type": "MeshPhongMaterial",
+      "uuid": "mat_phong_red",
+      "color": "0x7F2109"
+    },
+    {
+      "type": "MeshPhongMaterial",
+      "uuid": "mat_phong_yellow",
+      "color": "0xECC116"
+    },
+    {
+      "type": "MeshBasicMaterial",
+      "uuid": "mat_lehublot",
+      "map": "text_lehublot",
+      "transparent": false,
+      "side": 2
+    }
+  ],
+  "textures": [
+    {
+      "uuid": "text_lehublot",
+      "image": "img_lehublot",
+      "animated": false
+    }
+  ],
+  "images": [
+    {
+      "uuid": "img_lehublot",
+      "url": "lehublot.jpg"
+    }
+  ],
+  "videos": []
+}

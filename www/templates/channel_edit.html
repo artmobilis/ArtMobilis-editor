@@ -1,0 +1,51 @@
+<ion-header-bar class="bar-calm">
+  <a class="button button-icon icon ion-ios-arrow-back" ui-sref="channels_view"></a>
+  <h1 class="title">
+    Edit "{{channel.name}}"
+  </h1>
+</ion-header-bar>
+
+<ion-content>
+
+<label class="item item-input">
+  <span class="input-label">Name</span>
+  <input type="text" placeholder="Enter name" ng-model="channel.name">
+</label>
+
+  <ion-item>
+    <table>
+      <tr>
+        <td><img class="marker" ng-src="{{GetMarker(channel.marker).img}}"/></td>
+        <td style="vertical-align:middle"> {{GetMarker(channel.marker).name}} </td>
+      </tr>
+    </table>
+  </ion-item>
+
+  <ion-list show-delete="show_delete">
+    <ion-item ng-repeat="(index, contents) in channel.contents track by $index">
+
+      <table>
+        <tr>
+          <td><object-render object="{{GetContents(contents.uuid).object}}"
+            width="75" height="75">
+            </object-render></td>
+          <td style="vertical-align:middle">
+            <input type="text" placeholder="Enter name" ng-model="contents.name">
+          </td>
+        </tr>
+       </table>
+      <ion-delete-button class="ion-minus-circled" ng-click="RemoveContents(index)">
+
+      </ion-delete-button>
+    </ion-item>
+  </ion-list>
+
+</ion-content>
+
+<ion-footer-bar class="bar-stable">
+  <a class="button button-icon icon ion-minus-circled" ng-click="show_delete = !show_delete;"/>
+  <a class="button button-icon icon ion-images" ng-click="SelectMarker()"/>
+  <a class="button button-icon icon ion-edit" ng-click="OpenContentsTransform()"/>
+  <a class="button button-icon icon ion-plus-circled" ng-click="OpenContentsAdd()"/>
+</ion-footer-bar>
+
