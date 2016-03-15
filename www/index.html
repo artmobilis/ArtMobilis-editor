@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html>
 <head>
   <meta charset="utf-8">
@@ -15,63 +15,75 @@
   <!-- cordova script (this will be a 404 during development) -->
   <script src="cordova.js"></script>
 
+  <script src="lib/aruco/aruco.js"></script>
+  <script src="lib/aruco/cv.js"></script>
+  <script src="lib/aruco/posit2.js"></script>
+  <script src="lib/aruco/svd.js"></script>
+  <script src="lib/jsfeat/jsfeat.js"></script>
+  <script src="lib/libgif/libgif.js"></script>
+  <script src="lib/three/three.js"></script>
+  <script src="lib/three/ColladaLoader.js"></script>
+  <script src="lib/three/MTLLoader.js"></script>
+  <script src="lib/three/OBJLoader.js"></script>
+  <script src="lib/three/OBJMTLLoader.js"></script>
 
-  <script src="lib/ArtMobilib/ArtMobilib/ArtMobilib2.js"></script>
-
-  <script src="lib/ArtMobilib/ArtMobilib/three/three.js"></script>
-  <script src="lib/ArtMobilib/ArtMobilib/three/ColladaLoader.js"></script>
-  <script src="lib/ArtMobilib/ArtMobilib/three/MTLLoader.js"></script>
-  <script src="lib/ArtMobilib/ArtMobilib/three/OBJLoader.js"></script>
-  <script src="lib/ArtMobilib/ArtMobilib/three/OBJMTLLoader.js"></script>
-
-  <script src="lib/ArtMobilib/ArtMobilib/libgif/libgif.js"></script>
-
-  <script src="lib/ArtMobilib/ArtMobilib/aruco/cv.js"></script>
-  <script src="lib/ArtMobilib/ArtMobilib/aruco/aruco.js"></script>
-  <script src="lib/ArtMobilib/ArtMobilib/aruco/svd.js"></script>
-
-  <script src="lib/ArtMobilib/ArtMobilib/ObjectLoaderAM.js"></script>
-  <script src="lib/ArtMobilib/ArtMobilib/Scene.js"></script>
-  <script src="lib/ArtMobilib/ArtMobilib/TrackedObjManager.js"></script>
-
-  <script src="lib/ArtMobilib/ArtMobilib/device/DeviceLockScreenOrientation.js"></script>
-  <script src="lib/ArtMobilib/ArtMobilib/device/DeviceOrientationControl.js"></script>
+  <script src="lib/ArtMobilib/artmobilib.js"></script>
 
 
-  <script src="js/Channels.js"></script>
-  <script src="js/TrackingDataManager.js"></script>
   <script src="js/DeviceCameraPicture.js"></script>
-  <script src="js/FrontCamGrabbing.js"></script>
-  <script src="js/LoadingManager.js"></script>
-  <script src="js/MarkerDetector.js"></script>
+
 
   <!-- your app's js -->
   <script src="js/app.js"></script>
 
-  <script src="js/controllers/ChannelsViewCtrl.js"></script>
-  <script src="js/controllers/ChannelEditCtrl.js"></script>
-  <script src="js/controllers/CameraPictureCtrl.js"></script>
-  <script src="js/controllers/ChannelCreateCtrl.js"></script>
-  <script src="js/controllers/MarkerSelectCtrl.js"></script>
-  <script src="js/controllers/ContentsAddCtrl.js"></script>
-  <script src="js/controllers/ContentsTransformCtrl.js"></script>
+  <script src="js/app/ChannelsViewCtrl.js"></script>
+  <script src="js/app/ChannelEditCtrl.js"></script>
+  <script src="js/app/CameraPictureCtrl.js"></script>
+  <script src="js/app/ChannelCreateCtrl.js"></script>
+  <script src="js/app/MarkerSelectCtrl.js"></script>
+  <script src="js/app/ContentsAddCtrl.js"></script>
+  <script src="js/app/ContentsTransformCtrl.js"></script>
+  <script src="js/app/TrackingViewCtrl.js"></script>
+  <script src="js/app/LoadingCtrl.js"></script>
 
-  <script src="js/services/DataManagerSvc.js"></script>
-  <script src="js/services/ObjectRenderSvc.js"></script>
+  <script src="js/app/ObjectRenderSvc.js"></script>
+  <script src="js/app/LoadingSvc.js"></script>
 
-  <script src="js/factories/ConfigManager.js"></script>
-  <script src="js/factories/ListDirEntries.js"></script>
-  <script src="js/factories/AssetsLoader.js"></script>
-  <script src="js/factories/AssetsDownloader.js"></script>
-  <script src="js/factories/JsonLoader.js"></script>
+  <script src="js/app/ConfigManager.js"></script>
+  <script src="js/app/ListDirEntries.js"></script>
+  <script src="js/app/AssetsLoader.js"></script>
 
-  <script src="js/directives/objectRender.js"></script>
-  <script src="js/directives/channelRender.js"></script>
-  <script src="js/directives/trackingView.js"></script>
+  <script src="js/app/objectRender.js"></script>
+  <script src="js/app/channelRender.js"></script>
+
+  <!-- data module -->
+  <script src="js/data/dataModule.js"></script>
+  <script src="js/data/ChannelsManager.js"></script>
+  <script src="js/data/Journey.js"></script>
+  <script src="js/data/DataManagerSvc.js"></script>
+
+  <!-- journey module -->
+  <script src="js/journey/journeyModule.js"></script>
+  <script src="js/journey/CoordinatesConverterSvc.js"></script>
+  <script src="js/journey/GeolocationSvc.js"></script>
+  <script src="js/journey/JourneyManagerSvc.js"></script>
+  <script src="js/journey/JourneySceneSvc.js"></script>
+  <script src="js/journey/trackingView.js"></script>
+  
+  <!-- tracking module -->
+  <script src="js/tracking/trackingModule.js"></script>
+  <script src="js/tracking/MarkerDetectorSvc.js"></script>
+
+  <!-- utility module -->
+  <script src="js/utility/utilityModule.js"></script>
+  <script src="js/utility/CameraSvc.js"></script>
+  <script src="js/utility/LoadingSvc.js"></script>
+  <script src="js/utility/progressBar.js"></script>
+
 
 </head>
 
-<body ng-app="starter">
+<body ng-app="starter" style="height: 100%;">
 
    <ui-view>
 

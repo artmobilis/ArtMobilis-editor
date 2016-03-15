@@ -32,6 +32,58 @@
         "uuid": "mesh_lehublot",
         "geometry": "geo_plane",
         "material": "mat_lehublot"
+      },
+      {
+        "type": "Mesh",
+        "uuid": "mesh_frozen",
+        "geometry": "geo_plane",
+        "material": "mat_frozen"
+      },
+      {
+        "type": "Mesh",
+        "uuid": "mesh_banana",
+        "geometry": "geo_plane",
+        "material": "mat_banana"
+      },
+      {
+        "type": "Mesh",
+        "uuid": "mesh_landmark",
+        "geometry": "geo_box",
+        "material": "mat_phong_red",
+        "scale": [
+          5,
+          20,
+          5
+        ]
+      },
+      {
+        "type": "Mesh",
+        "uuid": "object_bouc",
+        "geometry": "geo_plane",
+        "material": "mat_lehublot",
+        "children": [
+          {
+            "type": "Sound",
+            "url": "./assets/sounds/bouc.mp3"
+          }
+        ]
+      },
+      {
+        "type": "Mesh",
+        "uuid": "mesh_polyhedron",
+        "geometry": "geo_polyhedron",
+        "material": "mat_phong_blue"
+      },
+      {
+        "type": "ImagePlane",
+        "uuid": "mesh_hub",
+        "url": "lehublot.jpg"
+      },
+      {
+        "type": "Mesh",
+        "uuid": "mesh_arcciel",
+        "geometry": "geo_plane",
+        "material": "mat_arcciel"
       }
     ]
   },
@@ -55,6 +107,12 @@
       "radius": 1,
       "widthSegments": 20,
       "heightSegments": 11
+    },
+    {
+      "type": "OctahedronGeometry",
+      "uuid": "geo_polyhedron",
+      "radius": 1,
+      "detail": 0
     }
   ],
   "materials": [
@@ -79,6 +137,24 @@
       "map": "text_lehublot",
       "transparent": false,
       "side": 2
+    },
+    {
+      "type": "MeshBasicMaterial",
+      "uuid": "mat_frozen",
+      "map": "text_frozen",
+      "side": 2
+    },
+    {
+      "type": "MeshBasicMaterial",
+      "uuid": "mat_banana",
+      "map": "text_banana",
+      "side": 2
+    },
+    {
+      "type": "MeshBasicMaterial",
+      "uuid": "mat_arcciel",
+      "map": "text_arcciel",
+      "side": 2
     }
   ],
   "textures": [
@@ -86,13 +162,43 @@
       "uuid": "text_lehublot",
       "image": "img_lehublot",
       "animated": false
+    },
+    {
+      "uuid": "text_frozen",
+      "video": "vid_frozen",
+      "loop": true
+    },
+    {
+      "uuid": "text_banana",
+      "image": "img_banana",
+      "animated": true
+    },
+    {
+      "uuid": "text_arcciel",
+      "image": "img_arcciel",
+      "animated": true
     }
   ],
   "images": [
     {
       "uuid": "img_lehublot",
       "url": "lehublot.jpg"
+    },
+    {
+      "uuid": "img_banana",
+      "url": "banana.gif"
+    },
+    {
+      "uuid": "img_arcciel",
+      "url": "arcciel-steven.gif"
     }
   ],
-  "videos": []
+  "videos": [
+    {
+      "uuid": "vid_frozen",
+      "url": "frozen480p.mp4",
+      "width": "480",
+      "height": "854"
+    }
+  ]
 }

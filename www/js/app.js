@@ -1,7 +1,6 @@
-angular.module('starter', ['ionic', 'ngCordova'])
+angular.module('starter', ['ionic', 'ngCordova', 'journey'])
 
-.run(['$ionicPlatform', '$rootScope', '$state', 'DataManagerSvc',
-  function($ionicPlatform, $rootScope, $state, DataManagerSvc) {
+.run(['$ionicPlatform', function($ionicPlatform) {
   $ionicPlatform.ready(function() {
 
     if(window.cordova && window.cordova.plugins.Keyboard) {
@@ -16,15 +15,6 @@ angular.module('starter', ['ionic', 'ngCordova'])
       StatusBar.styleDefault();
     }
 
-    var _is_web_view = ionic.Platform.isWebView();
-
-    $rootScope.is_web_view = _is_web_view;
-
-    if (_is_web_view)
-      DataManagerSvc.OpenCustomAssets();
-
-    DataManagerSvc.LoadConfig();
-
   });
 }])
 
@@ -34,7 +24,8 @@ angular.module('starter', ['ionic', 'ngCordova'])
 
   $stateProvider.state('tracking_view', {
     url: '/',
-    templateUrl: 'templates/tracking_view.html'
+    templateUrl: 'templates/tracking_view.html',
+    controller: "TrackingViewCtrl"
   })
 
   .state('channels_view', {
@@ -71,6 +62,12 @@ angular.module('starter', ['ionic', 'ngCordova'])
     url: 'channel_transform_contents/:channel_id/',
     templateUrl: 'templates/contents_transform.html',
     controller: 'ContentsTransformCtrl'
+  })
+
+  .state('loading', {
+    url: '/loading/:next_state',
+    templateUrl: 'templates/loading.html',
+    controller: 'LoadingCtrl'
   })
 
 }])
