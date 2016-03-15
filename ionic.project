@@ -1,6 +1,15 @@
 {
   "name": "Demo_ArtMobilib",
   "app_id": "",
+  "gulpStartupTasks": [
+    "sass",
+    "watch",
+    "minify-artmobilib"
+  ],
+  "watchPatterns": [
+    "www/**/*",
+    "!www/lib/**/*"
+  ],
   "browsers": [
     {
       "platform": "android",
