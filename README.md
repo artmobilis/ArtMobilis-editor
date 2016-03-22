@@ -1,1 +1,1 @@
-# ArtMobilis-editor
+# ArtMobilis-js-editor
