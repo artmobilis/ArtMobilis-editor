@@ -1,0 +1,23 @@
+{
+  "name": "artmobilis-js-editor",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app/index.js",
+  "scripts": {
+    "start": "electron .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/artmobilis/ArtMobilis-js-editor.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/artmobilis/ArtMobilis-js-editor/issues"
+  },
+  "homepage": "https://github.com/artmobilis/ArtMobilis-js-editor#readme",
+  "devDependencies": {
+    "electron-prebuilt": "^0.37.2"
+  }
+}

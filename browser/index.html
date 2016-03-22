@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Hello World!</title>
+  </head>
+  <body>
+    <button id="openTxt" onclick="openTxt();">Open txt</button>
+    <button id="openImg" onclick="openImg();">Open img</button>
+    <button id="saveTxt" onclick="saveTxt();">Save txt</button>
+    <button id="saveImg" onclick="saveImg();">Save img</button>
+    <br />
+    <textarea id="editor" style="width: 400px; height: 300px;"></textarea>
+    <img id="image" width="400px"/>
+    <script>
+      var remote = require('remote');
+      var dialog = remote.require('dialog');
+      var fs = require('fs');
+      var img;
+
+      function openTxt () {
+       dialog.showOpenDialog({ filters: [
+         { name: 'text', extensions: ['txt'] }
+        ]}, function (fileNames) {
+        if (fileNames === undefined) return;
+        var fileName = fileNames[0];
+        fs.readFile(fileName, 'utf-8', function (err, data) {
+          document.getElementById("editor").value = data;
+        });
+       }); 
+      }
+
+      function openImg () {
+       dialog.showOpenDialog({ filters: [
+         { name: 'image', extensions: ['jpg'] }
+        ]}, function (fileNames) {
+        if (fileNames === undefined) return;
+        var fileName = fileNames[0];
+        fs.readFile(fileName, function (err, data) {
+          img = data;
+          document.getElementById("image").src = 'data:image/jpeg;base64,'+data.toString('base64');
+        });
+       }); 
+      }
+
+      function saveTxt () {
+        dialog.showSaveDialog({ filters: [
+           { name: 'text', extensions: ['txt'] }
+          ]}, function (fileName) {
+          if (fileName === undefined) return;
+          fs.writeFile(fileName, document.getElementById("editor").value, function (err) {   
+           if (err === undefined) {
+             dialog.showMessageBox({ message: "The txt file has been saved! :-)",
+              buttons: ["OK"] });
+           } else {
+             dialog.showErrorBox("File Save Error", err.message);
+           }
+          });
+        }); 
+      }
+
+      function saveImg () {
+        dialog.showSaveDialog({ filters: [
+           { name: 'image', extensions: ['jpg'] }
+          ]}, function (fileName) {
+          if (fileName === undefined) return;
+          fs.writeFile(fileName, img, 'binary', function (err) {   
+           if (err === undefined) {
+             dialog.showMessageBox({ message: "The image file has been saved! :-)",
+              buttons: ["OK"] });
+           } else {
+             dialog.showErrorBox("File Save Error", err.message);
+           }
+          });
+        }); 
+      }
+    </script>
+  </body>
+</html>
