@@ -1,9 +1,3 @@
-/* enables CSS3 transition for simple collapses, accordion and also navbar in responsive view */
-.collapse { transition: height .3s ease-out; -webkit-transition: height .3s ease-out } 
-
-/* styles the close button for the dismissible popovers */
-.popover .close { position: absolute; top: 7px; right: 10px; }
-
 html, body {
   height: 100%;
 }
@@ -12,7 +6,6 @@ body {
   padding: 0px;
   margin: 0px;
   background: -webkit-canvas(background) no-repeat 50% 50%;
-  background-color: #403937;
 }
 
 .transparent {
@@ -119,7 +112,6 @@ progress::-webkit-progress-bar {
   flex-direction: column;
   width: 100%;
   height: 100%;
-  color: white;
 }
 
 #footer, #header {
