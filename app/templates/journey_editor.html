@@ -7,43 +7,55 @@
   <div id="content">
 
     <div id="navigation">
+    
 
-      {{GetJourney().journey.name}}<br>
-      <br>
-      POIs
-      <ul>
-        <li ng-repeat="(key, value) in GetJourney().pois">
-          {{value.name}}
-        </li>
-      </ul>
-      <br>
-      Channels
-      <ul>
-        <li ng-repeat="(key, value) in GetJourney().channels">
-          {{value.name}}
-        </li> 
-      </ul>
-      <br>
-      Markers
-      <ul>
-        <li ng-repeat="(key, value) in GetJourney().markers">
-          {{value.name}}
-        </li>
-      </ul>
-      <br>
-      Contents
-      <ul>
-        <li ng-repeat="(key, value) in GetJourney().contents">
-          {{value.name}}
-        </li>
-      </ul>
-      <br>
-      Objects
-      <ul>
-        <li ng-repeat="(key, value) in GetJourney().objects">
-          {{value.name}}
-        </li>
-      </ul>
+        <label class="btn" ng-model="asset_selection.model" uib-btn-radio="'journey'">
+          {{GetJourney().journey.name}}
+        </label>
+
+        <uib-accordion close-others="oneAtATime">
+          <uib-accordion-group heading="POIs" is-open="">
+            <label class="btn" ng-model="asset_selection.model"
+            uib-btn-radio="'{{'poi_' + key}}'"
+            ng-repeat="(key, value) in GetJourney().pois">
+              {{value.name || key}}
+            </label>
+          </uib-accordion-group>
+
+          <uib-accordion-group heading="Channels" is-open="">
+            <label class="btn" ng-model="asset_selection.model"
+            uib-btn-radio="'{{'channel_' + key}}'"
+            ng-repeat="(key, value) in GetJourney().channels">
+              {{value.name || key}}
+            </label>
+          </uib-accordion-group>
+
+          <uib-accordion-group heading="Markers" is-open="">
+            <label class="btn" ng-model="asset_selection.model"
+            uib-btn-radio="'{{'marker_' + key}}'"
+            ng-repeat="(key, value) in GetJourney().markers">
+              {{value.name || key}}
+            </label>
+          </uib-accordion-group>
+
+          <uib-accordion-group heading="Contents" is-open="">
+            <label class="btn" ng-model="asset_selection.model"
+            uib-btn-radio="'{{'content_' + key}}'"
+            ng-repeat="(key, value) in GetJourney().contents">
+              {{value.name || key}}
+            </label>
+          </uib-accordion-group>
+
+          <uib-accordion-group heading="Objects" is-open="">
+            <label class="btn" ng-model="asset_selection.model"
+            uib-btn-radio="'{{'object_' + key}}'"
+            ng-repeat="(key, value) in GetJourney().objects">
+              {{value.name || key}}
+            </label>
+          </uib-accordion-group>
+        </uib-accordion>
+
+
 
     </div>
 
