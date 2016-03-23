@@ -10,7 +10,7 @@ app.on('ready', function() {
       'webgl': true
     }
   });
-  // mainWindow.loadUrl('file://' + __dirname + '/app/index.html');
+  mainWindow.loadUrl('file://' + __dirname + '/app/index.html');
   // mainWindow.loadUrl('http://html5test.com/'); // to see what is available
   // mainWindow.openDevTools(); // to show the dev tools by default
 })
