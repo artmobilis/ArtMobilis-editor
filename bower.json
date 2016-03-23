@@ -5,10 +5,9 @@
   "dependencies": {
     "angular": "1.4.x",
     "angular-mocks": "1.4.x",
-    "jquery": "~2.2.1",
-    "bootstrap": "~3.1.1",
     "angular-route": "1.4.x",
     "angular-ui-router": "*",
+    "bootstrap.native": "*",
     "js-aruco": "https://github.com/jcmellado/js-aruco.git",
     "jsfeat": "^0.0.8",
     "libgif-js": "https://github.com/buzzfeed/libgif-js.git#8c044e1",
