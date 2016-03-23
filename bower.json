@@ -12,8 +12,12 @@
     "jsfeat": "^0.0.8",
     "libgif-js": "https://github.com/buzzfeed/libgif-js.git#8c044e1",
     "three.js": "https://github.com/mrdoob/three.js.git#r73",
-    "ArtMobilib": "https://github.com/artmobilis/ArtMobilib-js.git"
+    "ArtMobilib": "https://github.com/artmobilis/ArtMobilib-js.git",
+    "angular-bootstrap": "^1.2.5",
+    "angular-animate": "1.4.x"
   },
-  "devDependencies": {
+  "devDependencies": {},
+  "resolutions": {
+    "angular": "1.4.x"
   }
 }
