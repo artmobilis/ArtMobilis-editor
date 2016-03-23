@@ -6,6 +6,9 @@ node_modules/
 platforms/
 plugins/
 
+# libs
+lib
+
 # OS
 [Tt]humbs.db
 
