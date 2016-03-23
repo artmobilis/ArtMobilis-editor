@@ -1,0 +1,84 @@
+<div id="editor">
+
+  <div id="header">
+    header
+  </div>
+
+  <div id="content">
+
+    <div id="navigation">
+    
+
+        <label class="btn" ng-model="asset_selection.model" uib-btn-radio="'journey'">
+          {{GetJourney().journey.name}}
+        </label>
+
+        <uib-accordion close-others="oneAtATime">
+          <uib-accordion-group heading="POIs" is-open="">
+            <label class="btn" ng-model="asset_selection.model"
+            uib-btn-radio="'{{'poi_' + key}}'"
+            ng-repeat="(key, value) in GetJourney().pois">
+              {{value.name || key}}
+            </label>
+          </uib-accordion-group>
+
+          <uib-accordion-group heading="Channels" is-open="">
+            <label class="btn" ng-model="asset_selection.model"
+            uib-btn-radio="'{{'channel_' + key}}'"
+            ng-repeat="(key, value) in GetJourney().channels">
+              {{value.name || key}}
+            </label>
+          </uib-accordion-group>
+
+          <uib-accordion-group heading="Markers" is-open="">
+            <label class="btn" ng-model="asset_selection.model"
+            uib-btn-radio="'{{'marker_' + key}}'"
+            ng-repeat="(key, value) in GetJourney().markers">
+              {{value.name || key}}
+            </label>
+          </uib-accordion-group>
+
+          <uib-accordion-group heading="Contents" is-open="">
+            <label class="btn" ng-model="asset_selection.model"
+            uib-btn-radio="'{{'content_' + key}}'"
+            ng-repeat="(key, value) in GetJourney().contents">
+              {{value.name || key}}
+            </label>
+          </uib-accordion-group>
+
+          <uib-accordion-group heading="Objects" is-open="">
+            <label class="btn" ng-model="asset_selection.model"
+            uib-btn-radio="'{{'object_' + key}}'"
+            ng-repeat="(key, value) in GetJourney().objects">
+              {{value.name || key}}
+            </label>
+          </uib-accordion-group>
+        </uib-accordion>
+
+
+
+    </div>
+
+    <div id="preview">
+
+      preview
+
+      <div id="preview_journey">
+      </div>
+      <div id="edit_channel">
+      </div>
+
+    </div>
+
+    <div id="edit">
+      edit
+    </div>
+
+
+  </div>
+
+  <div id="footer">
+    footer
+  </div>
+
+</div>

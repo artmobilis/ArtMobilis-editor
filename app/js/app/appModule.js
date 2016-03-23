@@ -1,0 +1,1 @@
+angular.module('app', ['ui.router', 'data', 'ui.bootstrap', 'ngAnimate']);
