@@ -1,7 +1,6 @@
 {
   "directory": "app/lib",
   "ignoredDependencies": [
-    "angular-animate",
     "angular-sanitize",
     "angular-mocks"
   ]
