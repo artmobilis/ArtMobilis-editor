@@ -118,12 +118,16 @@ progress::-webkit-progress-bar {
   padding: 5px;
 }
 
+#header, #footer, #content, #navigation, #edit {
+  border-color: #c8c8c8;
+}
+
 #header {
-  border-bottom: 1px solid #544A46;
+  border-bottom: 1px solid;
 }
 
 #footer {
-  border-top: 1px solid #544A46;
+  border-top: 1px solid;
 }
 
 #content {
@@ -142,11 +146,11 @@ progress::-webkit-progress-bar {
 }
 
 #navigation {
-  border-right: 1px solid #544A46;
+  border-right: 1px solid;
 }
 
 #edit {
-  border-left: 1px solid #544A46;
+  border-left: 1px solid;
 }
 
 #preview {
@@ -156,4 +160,40 @@ progress::-webkit-progress-bar {
 #navigation > ul {
   list-style-type: none;
   padding: 5px;
+}
+
+.grp-border {
+  margin-top: 2px;
+  padding: 2px;
+}
+
+input[type="text"],
+input[type="number"] {
+  padding: 2px;
+  transition: background 0.3s;
+  background-color : #ffffff;
+  color: #222222;
+  width: 100%;
+  border: 1px solid #222222;
+  border-top: 2px solid #222222;
+  padding-left: 5px;
+}
+
+input[type="text"].focus,
+input[type="number"].focus,
+input[type="text"]:focus,
+input[type="number"]:focus {
+}
+
+.btn {
+  padding: 5px;
+  width: 100%;
+}
+
+h3 {
+  text-align: center;
+}
+
+.field-name {
+  text-align: center;
 }
