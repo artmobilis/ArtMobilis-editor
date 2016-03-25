@@ -7,53 +7,60 @@
   <div id="content">
 
     <div id="navigation">
-    
 
-        <label class="btn" ng-model="asset_selection.model" uib-btn-radio="'journey'">
-          {{GetJourney().journey.name}}
-        </label>
+      
+      <h3>Assets</h3>
 
-        <uib-accordion close-others="oneAtATime">
-          <uib-accordion-group heading="POIs" is-open="">
-            <label class="btn" ng-model="asset_selection.model"
-            uib-btn-radio="'{{'poi_' + key}}'"
-            ng-repeat="(key, value) in GetJourney().pois">
-              {{value.name || key}}
-            </label>
-          </uib-accordion-group>
+      <label class="btn btn-primary" ng-model="selection.model" uib-btn-radio="'journey'">
+        {{(!journey.name || journey.name === '') ? 'unnamed journey' : journey.name}}
+      </label>
 
-          <uib-accordion-group heading="Channels" is-open="">
-            <label class="btn" ng-model="asset_selection.model"
-            uib-btn-radio="'{{'channel_' + key}}'"
-            ng-repeat="(key, value) in GetJourney().channels">
-              {{value.name || key}}
-            </label>
-          </uib-accordion-group>
+      <uib-accordion close-others="oneAtATime">
+        <uib-accordion-group heading="POIs" is-open="">
+          <label class="btn btn-primary" ng-model="selection.model"
+          uib-btn-radio="'{{'pois_' + key}}'"
+          draggable drag="{{'DragAsset(\'pois\', \'' + key + '\')'}}"
+          ng-repeat="(key, value) in pois">
+            {{value.name || key}}
+          </label>
+        </uib-accordion-group>
 
-          <uib-accordion-group heading="Markers" is-open="">
-            <label class="btn" ng-model="asset_selection.model"
-            uib-btn-radio="'{{'marker_' + key}}'"
-            ng-repeat="(key, value) in GetJourney().markers">
-              {{value.name || key}}
-            </label>
-          </uib-accordion-group>
+        <uib-accordion-group heading="Channels" is-open="">
+          <label class="btn btn-primary" ng-model="selection.model"
+          uib-btn-radio="'{{'channels_' + key}}'"
+          draggable drag="{{'DragAsset(\'channels\', \'' + key + '\')'}}"
+          ng-repeat="(key, value) in channels">
+            {{value.name || key}}
+          </label>
+        </uib-accordion-group>
 
-          <uib-accordion-group heading="Contents" is-open="">
-            <label class="btn" ng-model="asset_selection.model"
-            uib-btn-radio="'{{'content_' + key}}'"
-            ng-repeat="(key, value) in GetJourney().contents">
-              {{value.name || key}}
-            </label>
-          </uib-accordion-group>
+        <uib-accordion-group heading="Markers" is-open="">
+          <label class="btn btn-primary" ng-model="selection.model"
+          draggable drag="{{'DragAsset(\'markers\', \'' + key + '\')'}}"
+          uib-btn-radio="'{{'markers_' + key}}'"
+          ng-repeat="(key, value) in markers">
+            {{value.name || key}}
+          </label>
+        </uib-accordion-group>
 
-          <uib-accordion-group heading="Objects" is-open="">
-            <label class="btn" ng-model="asset_selection.model"
-            uib-btn-radio="'{{'object_' + key}}'"
-            ng-repeat="(key, value) in GetJourney().objects">
-              {{value.name || key}}
-            </label>
-          </uib-accordion-group>
-        </uib-accordion>
+        <uib-accordion-group heading="Contents" is-open="">
+          <label class="btn btn-primary" ng-model="selection.model"
+          uib-btn-radio="'{{'contents_' + key}}'"
+          draggable drag="{{'DragAsset(\'contents\', \'' + key + '\')'}}"
+          ng-repeat="(key, value) in contents">
+            {{value.name || key}}
+          </label>
+        </uib-accordion-group>
+
+        <uib-accordion-group heading="Objects" is-open="">
+          <label class="btn btn-primary" ng-model="selection.model"
+          uib-btn-radio="'{{'objects_' + key}}'"
+          draggable drag="{{'DragAsset(\'objects\', \'' + key + '\')'}}"
+          ng-repeat="(key, value) in objects">
+            {{value.name || key}}
+          </label>
+        </uib-accordion-group>
+      </uib-accordion>
 
 
 
@@ -71,7 +78,41 @@
     </div>
 
     <div id="edit">
-      edit
+      <div id="edit_journey" ng-show="selection.type === 'journey'"
+      droppable drop="Drop">
+        <h3>Edit journey</h3>
+        <div class="field-name">Name</div>
+        <input type="text" ng-model="journey.name">
+        <ul class="grp-border">
+          <li ng-repeat="poi_id in journey.pois track by $index">{{pois[poi_id].name}}</li>
+        </ul>
+      </div>
+
+      <div id="edit_poi" ng-show="selection.type === 'pois'"
+      droppable drop="Drop">
+        <h3>Edit POI</h3>
+        <div class="field-name">Name</div>
+        <input type="text" ng-model="selection.elem.name">
+        <div class="field-name">Latitude</div>
+        <input type="number" ng-model="selection.elem.latitude" class="edit-field">
+        <div class="field-name">Longitude</div>
+        <input type="number" ng-model="selection.elem.longitude" class="edit-field">
+        <div class="field-name">Radius</div>
+        <input type="number" ng-model="selection.elem.radius" class="edit-field">
+      </div>
+
+      <div id="edit_channel" ng-show="selection.type === 'channels'"
+      droppable drop="Drop">
+        <h3>Edit channel</h3>
+        <input type="text" ng-model="selection.elem.name">
+        <div class="grp-border">
+          {{markers[selection.elem.marker].name}}
+        </div>
+        <div ng-repeat="chan_content in selection.elem.contents track by $index">
+          <input type="text" ng-model="chan_content.name">
+        </div>
+      </div>
+
     </div>
 
 
