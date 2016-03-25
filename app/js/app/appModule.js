@@ -1,1 +1,8 @@
-angular.module('app', ['ui.router', 'data', 'ui.bootstrap', 'ngAnimate']);
+angular.module('app', [
+  'ui.router',
+  'ui.bootstrap',
+  'ngAnimate',
+  'data',
+  'dataLoading'
+  ]
+);
