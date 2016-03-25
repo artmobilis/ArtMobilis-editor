@@ -1,8 +1,6 @@
 {
   "name": "Journey 1",
   "pois": [
-    "poi_1",
-    "poi_2",
-    "poi_3"
+    "poi_1"
   ]
 }
