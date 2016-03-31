@@ -175,7 +175,7 @@ angular.module('app')
     selection.model = type + '_' + id;
   }
 
-  function Remove() {
+  function Delete() {
     var data_jouney = DataManagerSvc.GetData();
     var container = data_jouney[selection.type];
 
@@ -201,7 +201,57 @@ angular.module('app')
         SetSelection(selection.type, previous);
       else
         ResetSelection();
+
+      DataManagerSvc.CleanReferences();
     }
+  }
+
+  function DetachFromPoi(poi, type, id) {
+    if (type === 'poi-channel') {
+      poi.channels.splice(id, 1);
+    }
+    else if (type === 'poi-channel-object') {
+      poi.channels[id].object = null;
+    }
+  }
+
+  function DetachFromChannel(channel, type, id) {
+    if (type === 'channel-content') {
+      channel.contents.splice(id, 1);
+    }
+    else if (type === 'channel-marker') {
+      channel.marker = null;
+    }
+  }
+
+  function DetachFromJourney(journey, type, id) {
+    if (type === 'journey-poi') {
+      journey.pois.splice(id, 1);
+    }
+  }
+
+  function DetachFromContent(content, type, id) {
+    if (type === 'content-object') {
+      content.object = null;
+    }
+  }
+
+  var detach_fctns = {
+    journey: DetachFromJourney,
+    pois: DetachFromPoi,
+    channels: DetachFromChannel,
+    contents: DetachFromContent
+  }
+
+  function Detach(event) {
+    event.preventDefault();
+    var data = event.dataTransfer.getData('Text');
+    var slice = SliceAssetId(data);
+
+    var fun = detach_fctns[selection.type];
+    if (fun)
+      fun(selection.elem, slice.type, slice.id);
+    $timeout();
   }
 
   DataManagerSvc.GetLoadPromise().then(function() {
@@ -229,6 +279,7 @@ angular.module('app')
   $scope.NewMarker = NewMarker;
   $scope.NewContent = NewContent;
   $scope.NewObject = NewObject;
-  $scope.Remove = Remove;
+  $scope.Delete = Delete;
+  $scope.Detach = Detach;
 
 }])
