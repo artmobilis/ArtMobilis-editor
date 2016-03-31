@@ -15,7 +15,7 @@
         {{(!journey.name || journey.name === '') ? 'unnamed journey' : journey.name}}
       </label>
 
-      <uib-accordion close-others="others">
+      <uib-accordion close-others="false">
         <uib-accordion-group heading="POIs" is-open="">
           <label class="btn btn-primary" ng-model="selection.model"
           uib-btn-radio="'{{'pois_' + key}}'"
@@ -118,7 +118,7 @@
         <input type="number" ng-model="selection.elem.radius" class="edit-field">
         <div class="field-name">Channels</div>
 
-        <uib-accordion close-others="others">
+        <uib-accordion close-others="false">
           <uib-accordion-group ng-repeat="(key, poi_channel) in selection.elem.channels"
           droppable drop="{{'DropToPoiChannel(\'' + selection.id + '\', \'' + key + '\');'}}">
             <uib-accordion-heading heading>
