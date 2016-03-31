@@ -13,4 +13,4 @@
 - ```bower install```
 
 ### 4 - Lancer le projet Electron
-```npm run electron```
+```npm run start```
