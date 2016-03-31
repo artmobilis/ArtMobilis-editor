@@ -115,7 +115,7 @@ progress::-webkit-progress-bar {
 }
 
 #footer, #header {
-  padding: 5px;
+  padding: 0px;
 }
 
 #header, #footer, #content, #navigation, #edit {
@@ -165,6 +165,8 @@ progress::-webkit-progress-bar {
 .grp-border {
   margin-top: 2px;
   padding: 2px;
+  border: 1px solid #222222;
+  min-height: 2em;
 }
 
 input[type="text"],
@@ -175,7 +177,7 @@ input[type="number"] {
   color: #222222;
   width: 100%;
   border: 1px solid #222222;
-  border-top: 2px solid #222222;
+  border-bottom: 2px solid #222222;
   padding-left: 5px;
 }
 
@@ -183,6 +185,7 @@ input[type="text"].focus,
 input[type="number"].focus,
 input[type="text"]:focus,
 input[type="number"]:focus {
+  border-color: #444444;
 }
 
 .btn {
@@ -196,4 +199,32 @@ h3 {
 
 .field-name {
   text-align: center;
+  margin-top: 1em;
+}
+
+.content-array {
+  margin-top: 2px;
+}
+
+select {
+  width: 100%;
+}
+
+ul {
+  list-style-type:none;
+  margin: 0px;
+  padding: 0px;
+}
+
+.btn-min {
+  width: auto;
+  height: auto;
+}
+
+.button-bar {
+  width: 100%;
+}
+
+.well {
+  box-shadow: 0px 0px 3px 1px rgba(0, 0, 0, 0.1) inset;
 }

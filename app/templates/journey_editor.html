@@ -1,7 +1,7 @@
 <div id="editor">
 
   <div id="header">
-    header
+    <journey-editor-toolbar></journey-editor-toolbar>
   </div>
 
   <div id="content">
@@ -15,14 +15,16 @@
         {{(!journey.name || journey.name === '') ? 'unnamed journey' : journey.name}}
       </label>
 
-      <uib-accordion close-others="oneAtATime">
+      <uib-accordion close-others="others">
         <uib-accordion-group heading="POIs" is-open="">
           <label class="btn btn-primary" ng-model="selection.model"
           uib-btn-radio="'{{'pois_' + key}}'"
           draggable drag="{{'DragAsset(\'pois\', \'' + key + '\')'}}"
           ng-repeat="(key, value) in pois">
+            <span ng-include="'templates/drag_icon.html'"></span>
             {{value.name || key}}
           </label>
+          <div ng-include="'templates/new_button.html'" ng-click="NewPoi()"></div>
         </uib-accordion-group>
 
         <uib-accordion-group heading="Channels" is-open="">
@@ -30,8 +32,10 @@
           uib-btn-radio="'{{'channels_' + key}}'"
           draggable drag="{{'DragAsset(\'channels\', \'' + key + '\')'}}"
           ng-repeat="(key, value) in channels">
+            <span ng-include="'templates/drag_icon.html'"></span>
             {{value.name || key}}
           </label>
+          <div ng-include="'templates/new_button.html'" ng-click="NewChannel()"></div>
         </uib-accordion-group>
 
         <uib-accordion-group heading="Markers" is-open="">
@@ -39,8 +43,10 @@
           draggable drag="{{'DragAsset(\'markers\', \'' + key + '\')'}}"
           uib-btn-radio="'{{'markers_' + key}}'"
           ng-repeat="(key, value) in markers">
+            <span ng-include="'templates/drag_icon.html'"></span>
             {{value.name || key}}
           </label>
+          <div ng-include="'templates/new_button.html'" ng-click="NewMarker()"></div>
         </uib-accordion-group>
 
         <uib-accordion-group heading="Contents" is-open="">
@@ -48,8 +54,10 @@
           uib-btn-radio="'{{'contents_' + key}}'"
           draggable drag="{{'DragAsset(\'contents\', \'' + key + '\')'}}"
           ng-repeat="(key, value) in contents">
+            <span ng-include="'templates/drag_icon.html'"></span>
             {{value.name || key}}
           </label>
+          <div ng-include="'templates/new_button.html'" ng-click="NewContent()"></div>
         </uib-accordion-group>
 
         <uib-accordion-group heading="Objects" is-open="">
@@ -57,8 +65,10 @@
           uib-btn-radio="'{{'objects_' + key}}'"
           draggable drag="{{'DragAsset(\'objects\', \'' + key + '\')'}}"
           ng-repeat="(key, value) in objects">
+            <span ng-include="'templates/drag_icon.html'"></span>
             {{value.name || key}}
           </label>
+          <div ng-include="'templates/new_button.html'" ng-click="NewObject()"></div>
         </uib-accordion-group>
       </uib-accordion>
 
@@ -81,16 +91,23 @@
       <div id="edit_journey" ng-show="selection.type === 'journey'"
       droppable drop="Drop">
         <h3>Edit journey</h3>
+        <div ng-include="'templates/trash_area.html'" droppable drop="Detach"></div>
         <div class="field-name">Name</div>
         <input type="text" ng-model="journey.name">
+        <div class="field-name">POIs</div>
         <ul class="grp-border">
-          <li ng-repeat="poi_id in journey.pois track by $index">{{pois[poi_id].name}}</li>
+          <li ng-repeat="poi_id in journey.pois track by $index"
+          draggable drag="{{'DragAsset(\'journey-poi\', \'' + $index + '\')'}}">
+            <span ng-include="'templates/drag_icon.html'"></span>
+            {{pois[poi_id].name}}
+          </li>
         </ul>
       </div>
 
       <div id="edit_poi" ng-show="selection.type === 'pois'"
       droppable drop="Drop">
         <h3>Edit POI</h3>
+        <div ng-include="'templates/trash_area.html'" droppable drop="Detach"></div>
         <div class="field-name">Name</div>
         <input type="text" ng-model="selection.elem.name">
         <div class="field-name">Latitude</div>
@@ -99,18 +116,103 @@
         <input type="number" ng-model="selection.elem.longitude" class="edit-field">
         <div class="field-name">Radius</div>
         <input type="number" ng-model="selection.elem.radius" class="edit-field">
+        <div class="field-name">Channels</div>
+
+        <uib-accordion close-others="others">
+          <uib-accordion-group ng-repeat="(key, poi_channel) in selection.elem.channels"
+          droppable drop="{{'DropToPoiChannel(\'' + selection.id + '\', \'' + key + '\');'}}">
+            <uib-accordion-heading heading>
+              <div draggable drag="{{'DragAsset(\'poi-channel\', \'' + key + '\')'}}">
+                <span ng-include="'templates/drag_icon.html'"></span>
+                {{channels[poi_channel.uuid].name}}
+              </div>
+            </uib-accordion-heading>
+            <div draggable drag="{{'DragAsset(\'poi-channel-object\', \'' + key + '\')'}}">
+              <div class="field-name">Object</div>
+              <div class="grp-border">
+                {{objects[poi_channel.object].name || poi_channel.object || 'Drop object'}}
+                <span ng-include="'templates/drag_icon.html'"></span>
+              </div>
+              <div ng-show="objects[poi_channel.object] !== undefined">
+                <div class="field-name">Object's latitude</div>
+                <input type="number" ng-model="poi_channel.latitude">
+                <div class="field-name">Object's longitude</div>
+                <input type="number" ng-model="poi_channel.longitude">
+                <div class="field-name">Object's altitude</div>
+                <input type="number" ng-model="poi_channel.altitude">
+                <div class="field-name">Object's scale</div>
+                <input type="number" ng-model="poi_channel.scale">
+              </div>
+            </div>
+          </uib-accordion-group>
+        </uib-accordion>
+
+        <div ng-include="'templates/delete_button.html'" ng-click="Delete()"></div>
+
       </div>
 
       <div id="edit_channel" ng-show="selection.type === 'channels'"
-      droppable drop="Drop">
+      droppable drop="Drop" style="height: 100%">
         <h3>Edit channel</h3>
+        <div ng-include="'templates/trash_area.html'" droppable drop="Detach"></div>
+        <div class="field-name">Name</div>
         <input type="text" ng-model="selection.elem.name">
-        <div class="grp-border">
+        <div class="field-name">Marker</div>
+        <div class="grp-border"
+        draggable drag="{{'DragAsset(\'channel-marker\', \'' + $index + '\')'}}">
           {{markers[selection.elem.marker].name}}
         </div>
-        <div ng-repeat="chan_content in selection.elem.contents track by $index">
-          <input type="text" ng-model="chan_content.name">
+        <div class="field-name">Contents</div>
+        <div class="content-array">
+          <div ng-repeat="chan_content in selection.elem.contents track by $index"
+          draggable drag="{{'DragAsset(\'channel-content\', \'' + $index + '\')'}}">
+            <div class="input-group">
+              <input type="text" ng-model="chan_content.name">
+              <span class="input-group-addon" ng-include="'templates/drag_icon.html'"></span>
+            </div>
+          </div>
         </div>
+        <div ng-include="'templates/delete_button.html'" ng-click="Delete()"></div>
+      </div>
+
+      <div id="edit_marker" ng-show="selection.type === 'markers'">
+        <h3>Edit marker</h3>
+        <div class="field-name">Name</div>
+        <input type="text" ng-model="selection.elem.name">
+        <div class="field-name">Type</div>
+        <select ng-model="selection.elem.type">
+          <option value="img">Image</option>
+          <option value="tag">Tag</option>
+        </select>
+        <div ng-show="selection.elem.type === 'tag'">
+        <div class="field-name">Tag id</div>
+          <input type="number" ng-model="selection.elem.tag_id">
+        </div>
+        <div class="field-name">Url</div>
+        <input type="text" ng-model="selection.elem.url">
+        <div ng-include="'templates/delete_button.html'" ng-click="Delete()"></div>
+      </div>
+
+      <div id="edit_content" ng-show="selection.type === 'contents'"
+      droppable drop="Drop">
+        <h3>Edit content</h3>
+        <div ng-include="'templates/trash_area.html'" droppable drop="Detach"></div>
+        <div class="field-name">Name</div>
+        <input type="text" ng-model="selection.elem.name">
+        <div class="field-name">Object</div>
+        <div class="grp-border" 
+        draggable drag="{{'DragAsset(\'content-object\', \'\')'}}">
+          {{objects[selection.elem.object].name || objects[selection.elem.object].uuid}}
+          <span ng-include="'templates/drag_icon.html'"></span>
+        </div>
+        <div ng-include="'templates/delete_button.html'" ng-click="Delete()"></div>
+      </div>
+
+      <div id="edit_object" ng-show="selection.type === 'objects'">
+        <h3>Edit object</h3>
+        <div class="field-name">Name</div>
+        <input type="text" ng-model="selection.elem.name">
+        <div ng-include="'templates/delete_button.html'" ng-click="Delete()"></div>
       </div>
 
     </div>
@@ -119,7 +221,7 @@
   </div>
 
   <div id="footer">
-    footer
+    <!-- empty footer -->
   </div>
 
 </div>

@@ -38,6 +38,7 @@ angular.module('app')
     link: function(scope, element, attrs) {
       // again we need the native object
       var el = element[0];
+      var drop = null;
       
       el.addEventListener('dragover', function(event) {
         event.dataTransfer.dropEffect = 'move';
@@ -59,7 +60,7 @@ angular.module('app')
         if (event.stopPropagation) event.stopPropagation();
         this.classList.remove('over');
         if (drop) $parse(drop)(scope)(event);
-        
+
         return false;
       }, false);
 

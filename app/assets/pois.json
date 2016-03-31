@@ -32,12 +32,7 @@
         "scale": 2
       },
       {
-        "uuid": "channel_image",
-        "object": "mesh_polyhedron",
-        "longitude": 43.714238,
-        "latitude": 7.288872,
-        "altitude": 6,
-        "scale": 2
+        "uuid": "channel_image"
       }
     ]
   },
