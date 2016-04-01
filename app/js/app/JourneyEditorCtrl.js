@@ -20,6 +20,10 @@ angular.module('app')
     id: null
   }
 
+  $scope.tool = {
+    name: ''
+  }
+
   function ResetSelection() {
     selection.model = 'journey';
     OnAssetSelectionChange();

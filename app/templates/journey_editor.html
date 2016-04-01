@@ -11,13 +11,13 @@
       
       <h3>Assets</h3>
 
-      <label class="btn btn-primary" ng-model="selection.model" uib-btn-radio="'journey'">
+      <label class="btn btn-primary btn-list-item" ng-model="selection.model" uib-btn-radio="'journey'">
         {{(!journey.name || journey.name === '') ? 'unnamed journey' : journey.name}}
       </label>
 
       <uib-accordion close-others="false">
         <uib-accordion-group heading="POIs" is-open="">
-          <label class="btn btn-primary" ng-model="selection.model"
+          <label class="btn btn-primary btn-list-item" ng-model="selection.model"
           uib-btn-radio="'{{'pois_' + key}}'"
           draggable drag="{{'DragAsset(\'pois\', \'' + key + '\')'}}"
           ng-repeat="(key, value) in pois">
@@ -28,7 +28,7 @@
         </uib-accordion-group>
 
         <uib-accordion-group heading="Channels" is-open="">
-          <label class="btn btn-primary" ng-model="selection.model"
+          <label class="btn btn-primary btn-list-item" ng-model="selection.model"
           uib-btn-radio="'{{'channels_' + key}}'"
           draggable drag="{{'DragAsset(\'channels\', \'' + key + '\')'}}"
           ng-repeat="(key, value) in channels">
@@ -39,7 +39,7 @@
         </uib-accordion-group>
 
         <uib-accordion-group heading="Markers" is-open="">
-          <label class="btn btn-primary" ng-model="selection.model"
+          <label class="btn btn-primary btn-list-item" ng-model="selection.model"
           draggable drag="{{'DragAsset(\'markers\', \'' + key + '\')'}}"
           uib-btn-radio="'{{'markers_' + key}}'"
           ng-repeat="(key, value) in markers">
@@ -50,7 +50,7 @@
         </uib-accordion-group>
 
         <uib-accordion-group heading="Contents" is-open="">
-          <label class="btn btn-primary" ng-model="selection.model"
+          <label class="btn btn-primary btn-list-item" ng-model="selection.model"
           uib-btn-radio="'{{'contents_' + key}}'"
           draggable drag="{{'DragAsset(\'contents\', \'' + key + '\')'}}"
           ng-repeat="(key, value) in contents">
@@ -61,7 +61,7 @@
         </uib-accordion-group>
 
         <uib-accordion-group heading="Objects" is-open="">
-          <label class="btn btn-primary" ng-model="selection.model"
+          <label class="btn btn-primary btn-list-item" ng-model="selection.model"
           uib-btn-radio="'{{'objects_' + key}}'"
           draggable drag="{{'DragAsset(\'objects\', \'' + key + '\')'}}"
           ng-repeat="(key, value) in objects">
@@ -73,19 +73,20 @@
       </uib-accordion>
 
 
-
     </div>
 
-    <div id="preview">
 
-      preview
-
-      <div id="preview_journey">
+    <div id="editor-3D">
+      <channel-editor id="transform_channel"
+      channel-id="{{selection.type === 'channels' ? selection.id : null}}">
+      </channel-editor>
+      <div id="editor-3D-toolbar" class="btn-group" ng-init="tool.name='position'">
+        <label class="btn toolbar-item" ng-model="tool.name" uib-btn-radio="'position'">Move</label>
+        <label class="btn toolbar-item" ng-model="tool.name" uib-btn-radio="'rotation'">Rotate</label>
+        <label class="btn toolbar-item" ng-model="tool.name" uib-btn-radio="'scale'">Scale</label>
       </div>
-      <div id="edit_channel">
-      </div>
-
     </div>
+
 
     <div id="edit">
       <div id="edit_journey" ng-show="selection.type === 'journey'"
@@ -128,10 +129,10 @@
               </div>
             </uib-accordion-heading>
             <div draggable drag="{{'DragAsset(\'poi-channel-object\', \'' + key + '\')'}}">
+              <span ng-include="'templates/drag_icon.html'"></span>
               <div class="field-name">Object</div>
               <div class="grp-border">
                 {{objects[poi_channel.object].name || poi_channel.object || 'Drop object'}}
-                <span ng-include="'templates/drag_icon.html'"></span>
               </div>
               <div ng-show="objects[poi_channel.object] !== undefined">
                 <div class="field-name">Object's latitude</div>
@@ -216,12 +217,13 @@
       </div>
 
     </div>
-
+    
 
   </div>
 
   <div id="footer">
     <!-- empty footer -->
   </div>
+
 
 </div>
