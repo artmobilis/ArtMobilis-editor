@@ -12,6 +12,7 @@
     "libgif-js": "https://github.com/buzzfeed/libgif-js.git#8c044e1",
     "three.js": "https://github.com/mrdoob/three.js.git#r73",
     "ArtMobilib": "https://github.com/artmobilis/ArtMobilib-js.git",
+    "ArtMobilis-js-ngmodules": "https://github.com/artmobilis/ArtMobilis-js-ngmodules.git",
     "angular-bootstrap": "^1.2.5",
     "angular-animate": "1.4.x",
     "angular-uuid4": "https://github.com/monicao/angular-uuid4.git#^0.3.1"
