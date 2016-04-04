@@ -4,8 +4,7 @@
     "marker": "tag_10",
     "contents": [
       {
-        "uuid": "frozen",
-        "scale": 0.75
+        "uuid": "frozen"
       }
     ]
   },
@@ -14,8 +13,7 @@
     "marker": "tag_200",
     "contents": [
       {
-        "uuid": "arcciel",
-        "scale": 0.75
+        "uuid": "arcciel"
       }
     ]
   },
@@ -24,8 +22,7 @@
     "marker": "tag_1001",
     "contents": [
       {
-        "uuid": "frozen",
-        "scale": 0.75
+        "uuid": "frozen"
       }
     ]
   },
@@ -35,8 +32,7 @@
     "marker": "marker_1",
     "contents": [
       {
-        "uuid": "lehublot",
-        "scale": 0.5
+        "uuid": "lehublot"
       }
     ]
   },
@@ -46,8 +42,7 @@
     "marker": "tag_1001",
     "contents": [
       {
-        "uuid": "bouc",
-        "scale": 0.75
+        "uuid": "bouc"
       }
     ]
   },
@@ -57,8 +52,7 @@
     "marker": "marker_1",
     "contents": [
       {
-        "uuid": "banana",
-        "scale": 0.3
+        "uuid": "banana"
       }
     ]
   }

@@ -144,12 +144,14 @@
       "type": "MeshBasicMaterial",
       "uuid": "mat_banana",
       "map": "text_banana",
+      "transparent": true,
       "side": 2
     },
     {
       "type": "MeshBasicMaterial",
       "uuid": "mat_arcciel",
       "map": "text_arcciel",
+      "transparent": true,
       "side": 2
     }
   ],
