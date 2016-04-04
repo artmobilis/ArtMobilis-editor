@@ -76,16 +76,10 @@
     </div>
 
 
-    <div id="editor-3D">
+    <div id="editor-3D" droppable drop="Drop">
       <channel-editor id="transform_channel"
-      channel-id="{{selection.type === 'channels' ? selection.id : null}}"
-      mode="{{tool.name}}">
+      channel-id="{{selection.type === 'channels' ? selection.id : null}}">
       </channel-editor>
-      <div id="editor-3D-toolbar" class="btn-group" ng-init="tool.name='translate'">
-        <label class="btn toolbar-item" ng-model="tool.name" uib-btn-radio="'translate'">Move</label>
-        <label class="btn toolbar-item" ng-model="tool.name" uib-btn-radio="'rotate'">Rotate</label>
-        <label class="btn toolbar-item" ng-model="tool.name" uib-btn-radio="'scale'">Scale</label>
-      </div>
     </div>
 
 

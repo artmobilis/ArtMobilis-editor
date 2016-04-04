@@ -4,11 +4,17 @@ angular.module('app')
   return {
     restrict: 'AE',
     scope: {
-      channel_id: '@channelId',
-      mode: '@mode'
+      channel_id: '@channelId'
     },
-    template: "<canvas></canvas>",
+    templateUrl: "templates/channel_editor.html",
     link: function(scope, element, attr) {
+      scope.mode = 'translate';
+      scope.index = null;
+      scope.GetSelectionName = function() {
+        if (scope.channel_id && typeof scope.index === 'number')
+          return DataManagerSvc.GetData().channels[scope.channel_id].contents[scope.index].name;
+        return null;
+      }
 
       var DEFAULT_CAMERA = new THREE.PerspectiveCamera(50, 1, 0.1, 10000);
       DEFAULT_CAMERA.name = 'Camera';
@@ -28,7 +34,7 @@ angular.module('app')
 
       var _scene_helpers = new THREE.Scene();
 
-      var _selected = null;
+      var _selection = null;
       var _helpers = {};
 
       var _running = false;
@@ -50,27 +56,10 @@ angular.module('app')
 
       var _transform_controls = new THREE.TransformControls(_camera, _element);
 
-      _transform_controls.addEventListener('change', function() {
-        var object = _transform_controls.object;
-        if (object !== undefined) {
-          _selection_box.update(object);
-        }
-        Render();
-      });
-      _transform_controls.addEventListener('mouseDown', function () {
-        _controls.enabled = false;
-      });
-      _transform_controls.addEventListener('mouseUp', function () {
-        _controls.enabled = true;
-      });
-
       // _controls need to be added *after* main logic,
       // otherwise _controls.enabled doesn't work.
 
       var _controls = new THREE.EditorControls(_camera, _element);
-      _controls.addEventListener('change', function () {
-        _transform_controls.update();
-      });
 
 
       var AddHelper = function() {
@@ -131,19 +120,33 @@ angular.module('app')
       }
 
       function Select(object) {
-        if ( _selected === object ) return;
-
-        var uuid = null;
-        if (object !== null) {
-          uuid = object.uuid;
+        while (object) {
+          if (typeof object.userData.index === 'number')
+            break;
+          object = object.parent;
         }
 
-        _selected = object;
+        if ( _selection === object ) return;
 
-        if (_selected)
-          _transform_controls.attach(_selected);
-        else
-          _transform_controls.detach();
+        _selection = object;
+
+        scope.index = null;
+
+        _selection_box.visible = false;
+        _transform_controls.detach();
+
+        if (object !== null) {
+          scope.index = _selection.userData.index;
+          if (object.geometry !== undefined &&
+             object instanceof THREE.Sprite === false) {
+
+            _selection_box.update(object);
+            _selection_box.visible = true;
+          }
+
+          _transform_controls.attach(object);
+        }
+        scope.$apply();
       }
 
       // object picking
@@ -164,6 +167,14 @@ angular.module('app')
       function GetMousePosition(dom, x, y) {
         var rect = dom.getBoundingClientRect();
         return [(x - rect.left) / rect.width, (y - rect.top) / rect.height];
+      }
+
+      function OnTransformControlsMouseDown() {
+        _controls.enabled = false;
+      }
+
+      function OnTransformControlsMouseUp() {
+        _controls.enabled = true;
       }
 
       function HandleClick() {
@@ -238,31 +249,67 @@ angular.module('app')
         }
       }
 
-
-      function OnObjectSelected(object) {
-        _selection_box.visible = false;
-        _transform_controls.detach();
-
-        if (object !== null) {
-          if (object.geometry !== undefined &&
-             object instanceof THREE.Sprite === false) {
-
-            _selection_box.update(object);
-            _selection_box.visible = true;
-          }
-
-          _transform_controls.attach(object);
-        }
-        render();
-      }
-
       function OnObjectFocused(object) {
         _controls.focus(object);
       }
 
-      function OnChange() {
-        // Update();
-        // Render();
+      function OnControlsChange() {
+        _transform_controls.update();
+      }
+
+      function Point3DCopy(src, dst) {
+        dst.x = src.x;
+        dst.y = src.y;
+        dst.z = src.z;
+      }
+
+      function SaveChanges(object) {
+        if (object && typeof object.userData.index === 'number') {
+          var index = object.userData.index;
+          if (_channel) {
+            var content = _channel.contents[index];
+            Point3DCopy(object.position, content.position);
+            Point3DCopy(object.rotation, content.rotation);
+            Point3DCopy(object.scale, content.scale);
+          }
+        }
+      }
+
+      function OnTransformChange() {
+        var object = _transform_controls.object;
+        if (object !== undefined) {
+
+          _selection_box.update(object);
+
+          SaveChanges(object);
+        }
+      }
+
+      function OnChannelChange() {
+        AMTHREE.StopAnimatedTextures(_scene);
+        AMTHREE.StopSounds(_scene);
+        _transform_controls.detach();
+        _marker_mesh.visible = false;
+        _contents_meshes.visible = false;
+        _selection_box.visible = false;
+        _channel = null;
+        scope.selection = null;
+      }
+
+      function SetChannel() {
+        LoadContents();
+
+        var marker = DataManagerSvc.GetData().markers[_channel.marker];
+        if (marker) {
+          (new THREE.TextureLoader()).load(marker.url, function(texture) {
+            _marker_mesh.material.map = texture;
+            _marker_mesh.material.needsUpdate = true;
+            _marker_mesh.visible = true;
+            _contents_meshes.visible = true;
+            AMTHREE.PlayAnimatedTextures(_scene);
+            AMTHREE.PlaySounds(_scene);
+          });
+        }
       }
 
       function Update() {
@@ -279,20 +326,16 @@ angular.module('app')
       }
 
       function OnWindowResize() {
-        var width = _element.clientWidth;
-        var height = _element.clientHeight;
-
-        _canvas.width = 0;
-        _canvas.height = 0;
-
-        window.setTimeout(function() {
-          _renderer.setSize(width, height);
+          _renderer.setSize(_element.clientWidth, _element.clientHeight);
           _camera.aspect = _renderer.domElement.width / _renderer.domElement.height;
           _camera.updateProjectionMatrix();
-          OnChange();
-        }, 0);
       }
 
+      function CheckCanvasSize() {
+        if (_element.clientWidth != _canvas.width || _element.clientHeight != _canvas.height) {
+          OnWindowResize();
+        }
+      }
 
       function GetBoundingSphere(object, sphere) {
         var box = new THREE.Box3();
@@ -326,7 +369,8 @@ angular.module('app')
 
           object = object.clone();
 
-          object.userData = index;
+          object.userData = object.userData || {};
+          object.userData.index = index;
 
 
           var pos = contents_transform.position;
@@ -335,7 +379,7 @@ angular.module('app')
 
           object.position.set(pos.x, pos.y, pos.z);
           object.rotation.set(rot.x, rot.y, rot.z);
-          object.scale.set(scale, scale, scale);
+          object.scale.set(scale.x, scale.y, scale.z);
 
           GetBoundingSphere(object, sphere);
 
@@ -344,63 +388,27 @@ angular.module('app')
       }
 
 
-      _element.addEventListener('mousedown', OnMouseDown, false);
-      _element.addEventListener('touchstart', OnTouchStart, false);
-      _element.addEventListener('dblclick', OnDoubleClick, false);
-
-      window.addEventListener('resize', OnWindowResize, false);
-      OnWindowResize();
-
-      _transform_controls.addEventListener('change', OnChange, false);
-      _controls.addEventListener('change', OnChange, false);
-
-
-      _scene.add(_camera);
-
       _scene.add(new THREE.HemisphereLight(0xffffbb, 0x080820, 1));
       _scene.add(new THREE.AmbientLight(0x404040));
 
       _scene.add(_contents_meshes);
       _scene.add(_marker_mesh);
 
-      _scene.add(_transform_controls);
+      _scene_helpers.add(_transform_controls);
 
-      _scene.add(_grid);
-
-      OnChange();
+      _scene_helpers.add(_grid);
 
 
 
       scope.$watch('channel_id', function(attr_channel_id) {
-        AMTHREE.StopAnimatedTextures(_scene);
-        AMTHREE.StopSounds(_scene);
-        _transform_controls.detach();
+        OnChannelChange();
 
         _channel = DataManagerSvc.GetData().channels[attr_channel_id];
-        if (!_channel) {
-          _marker_mesh.visible = false;
-          _contents_meshes.visible = false;
-          OnChange();
+        if (!_channel)
           return;
-        }
 
         DataManagerSvc.GetLoadPromise().then(function() {
-
-          LoadContents();
-
-          var marker = DataManagerSvc.GetData().markers[_channel.marker];
-          if (marker) {
-            (new THREE.TextureLoader()).load(marker.url, function(texture) {
-              _marker_mesh.material.map = texture;
-              _marker_mesh.material.needsUpdate = true;
-              _marker_mesh.visible = true;
-              _contents_meshes.visible = true;
-              AMTHREE.PlayAnimatedTextures(_scene);
-              AMTHREE.PlaySounds(_scene);
-              OnChange();
-            });
-          }
-
+          SetChannel();
         });
 
       });
@@ -415,6 +423,7 @@ angular.module('app')
         function Loop() {
           if (_running) {
             window.requestAnimationFrame(Loop);
+            CheckCanvasSize();
             Update();
             Render();
           }
@@ -423,18 +432,37 @@ angular.module('app')
       })();
 
 
+      window.addEventListener('resize', OnWindowResize, false);
+      OnWindowResize();
+
+      _canvas.addEventListener('mousedown', OnMouseDown, false);
+      _canvas.addEventListener('touchstart', OnTouchStart, false);
+      _canvas.addEventListener('dblclick', OnDoubleClick, false);
+
+      _transform_controls.addEventListener('change', OnTransformChange, false);
+      _transform_controls.addEventListener('mouseDown', OnTransformControlsMouseDown);
+      _transform_controls.addEventListener('mouseUp', OnTransformControlsMouseUp);
+
+      _controls.addEventListener('change', OnControlsChange, false);
+
+
       scope.$on('$destroy', function() {
-        _running = false;
         window.removeEventListener('resize', OnWindowResize, false);
 
-        _element.removeEventListener('mousedown', OnMouseDown, false);
-        _element.removeEventListener('touchstart', OnTouchStart, false);
-        _element.removeEventListener('dblclick', OnDoubleClick, false);
+        _canvas.removeEventListener('mousedown', OnMouseDown, false);
+        _canvas.removeEventListener('touchstart', OnTouchStart, false);
+        _canvas.removeEventListener('dblclick', OnDoubleClick, false);
 
-        _transform_controls.removeEventListener('change', OnChange, false);
-        _controls.removeEventListener('change', OnChange, false);
+        _transform_controls.removeEventListener('change', OnTransformChange, false);
+        _transform_controls.removeEventListener('mouseDown', OnTransformControlsMouseDown);
+        _transform_controls.removeEventListener('mouseUp', OnTransformControlsMouseUp);
+
+        _controls.removeEventListener('change', OnControlsChange, false);
+
+        _running = false;
       })
 
     }
+
   }
 }])

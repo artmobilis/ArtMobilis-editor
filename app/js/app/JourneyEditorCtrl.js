@@ -20,8 +20,15 @@ angular.module('app')
     id: null
   }
 
-  $scope.tool = {
-    name: ''
+  function OnChannelUpdated() {
+    $timeout(function() {
+      var type = selection.type;
+      var id = selection.id;
+      ResetSelection();
+      $timeout(function() {
+        SetSelection(type, id);
+      });
+    })
   }
 
   function ResetSelection() {
@@ -91,6 +98,10 @@ angular.module('app')
         );
       $timeout();
     }
+    else
+      return;
+
+    OnChannelUpdated();
   }
 
   function DropToJourney(journey, type, id) {
@@ -226,6 +237,10 @@ angular.module('app')
     else if (type === 'channel-marker') {
       channel.marker = null;
     }
+    else
+      return;
+
+    OnChannelUpdated();
   }
 
   function DetachFromJourney(journey, type, id) {
