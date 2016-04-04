@@ -23,20 +23,21 @@ angular.module('app')
 
       var _scene = new THREE.Scene();
       _scene.name = 'Scene';
-      var _renderer = new THREE.WebGLRenderer( { alpha: true, canvas: _canvas } );
+      var _renderer = new THREE.WebGLRenderer( { alpha: true, canvas: _canvas, antialias: true } );
+      _renderer.autoClear = false;
 
       var _scene_helpers = new THREE.Scene();
 
       var _selected = null;
       var _helpers = {};
 
+      var _running = false;
 
-      var _grid = new THREE.GridHelper( 30, 1 );
 
+      var _grid = new THREE.GridHelper( 50, 1 );
+      _grid.scale.x = _grid.scale.y = _grid.scale.z = 0.25;
 
       var _channel;
-
-      var _running = true;
 
       var _marker_mesh, _contents_meshes = new THREE.Object3D();
       CreateMarkerObject();
@@ -70,7 +71,6 @@ angular.module('app')
       _controls.addEventListener('change', function () {
         _transform_controls.update();
       });
-
 
 
       var AddHelper = function() {
@@ -109,7 +109,6 @@ angular.module('app')
           _helpers[object.id] = helper;
 
         };
-
       }();
 
       function RemoveHelper(object) {
@@ -145,10 +144,6 @@ angular.module('app')
           _transform_controls.attach(_selected);
         else
           _transform_controls.detach();
-      }
-
-      function Focus(position) {
-        _camera.lookAt(position);
       }
 
       // object picking
@@ -239,14 +234,9 @@ angular.module('app')
         if (intersects.length > 0) {
           var intersect = intersects[0];
 
-          Focus(intersect.object.position);
+          OnObjectFocused(intersect.object);
         }
       }
-
-      _element.addEventListener( 'mousedown', OnMouseDown, false );
-      _element.addEventListener( 'touchstart', OnTouchStart, false );
-      _element.addEventListener( 'dblclick', OnDoubleClick, false );
-
 
 
       function OnObjectSelected(object) {
@@ -264,12 +254,20 @@ angular.module('app')
           _transform_controls.attach(object);
         }
         render();
-      };
+      }
 
       function OnObjectFocused(object) {
         _controls.focus(object);
-      };
+      }
 
+      function OnChange() {
+        // Update();
+        // Render();
+      }
+
+      function Update() {
+        AMTHREE.UpdateAnimatedTextures(_scene);
+      }
 
       function Render() {
         _scene_helpers.updateMatrixWorld();
@@ -277,13 +275,13 @@ angular.module('app')
 
         _renderer.clear();
         _renderer.render(_scene, _camera);
+        _renderer.render(_scene_helpers, _camera);
       }
 
       function OnWindowResize() {
-        ResizeRenderer(_element.clientWidth, _element.clientHeight);
-      }
+        var width = _element.clientWidth;
+        var height = _element.clientHeight;
 
-      function ResizeRenderer(width, height) {
         _canvas.width = 0;
         _canvas.height = 0;
 
@@ -291,19 +289,9 @@ angular.module('app')
           _renderer.setSize(width, height);
           _camera.aspect = _renderer.domElement.width / _renderer.domElement.height;
           _camera.updateProjectionMatrix();
+          OnChange();
         }, 0);
       }
-
-      window.addEventListener('resize', OnWindowResize, false);
-      OnWindowResize();
-
-      scope.$on('$destroy', function() {
-        _running = false;
-        window.removeEventListener('resize', OnWindowResize, false);
-      _element.removeEventListener('mousedown', OnMouseDown, false);
-      _element.removeEventListener('touchstart', OnTouchStart, false);
-      _element.removeEventListener('dblclick', OnDoubleClick, false);
-      })
 
 
       function GetBoundingSphere(object, sphere) {
@@ -355,6 +343,18 @@ angular.module('app')
         }
       }
 
+
+      _element.addEventListener('mousedown', OnMouseDown, false);
+      _element.addEventListener('touchstart', OnTouchStart, false);
+      _element.addEventListener('dblclick', OnDoubleClick, false);
+
+      window.addEventListener('resize', OnWindowResize, false);
+      OnWindowResize();
+
+      _transform_controls.addEventListener('change', OnChange, false);
+      _controls.addEventListener('change', OnChange, false);
+
+
       _scene.add(_camera);
 
       _scene.add(new THREE.HemisphereLight(0xffffbb, 0x080820, 1));
@@ -367,16 +367,22 @@ angular.module('app')
 
       _scene.add(_grid);
 
+      OnChange();
+
 
 
       scope.$watch('channel_id', function(attr_channel_id) {
-
-        _running = false;
+        AMTHREE.StopAnimatedTextures(_scene);
+        AMTHREE.StopSounds(_scene);
+        _transform_controls.detach();
 
         _channel = DataManagerSvc.GetData().channels[attr_channel_id];
-
-        if (!_channel)
+        if (!_channel) {
+          _marker_mesh.visible = false;
+          _contents_meshes.visible = false;
+          OnChange();
           return;
+        }
 
         DataManagerSvc.GetLoadPromise().then(function() {
 
@@ -387,31 +393,47 @@ angular.module('app')
             (new THREE.TextureLoader()).load(marker.url, function(texture) {
               _marker_mesh.material.map = texture;
               _marker_mesh.material.needsUpdate = true;
+              _marker_mesh.visible = true;
+              _contents_meshes.visible = true;
+              AMTHREE.PlayAnimatedTextures(_scene);
+              AMTHREE.PlaySounds(_scene);
+              OnChange();
             });
           }
 
-          _running = true;
-          (function step() {
-            if (_running) {
-
-              // if (_selected) {
-              //   _selected.position.copy(scope.position);
-              //   _selected.rotation.copy(scope.rotation);
-              //   _selected.scale.x = _selected.scale.y = _selected.scale.z = scope.scale;
-
-              //   _selection_object.position.copy(_selected.position);
-              //   _selection_object.rotation.copy(_selected.rotation);
-              //   _selection_object.scale.copy(_selected.scale);
-              // }
-
-              Render();
-
-              window.requestAnimationFrame(step);
-            }
-          })();
         });
+
       });
 
+      scope.$watch('mode', function(mode) {
+        _transform_controls.setMode(mode);
+      });
+
+
+      (function Run() {
+        _running = true;
+        function Loop() {
+          if (_running) {
+            window.requestAnimationFrame(Loop);
+            Update();
+            Render();
+          }
+        };
+        Loop();
+      })();
+
+
+      scope.$on('$destroy', function() {
+        _running = false;
+        window.removeEventListener('resize', OnWindowResize, false);
+
+        _element.removeEventListener('mousedown', OnMouseDown, false);
+        _element.removeEventListener('touchstart', OnTouchStart, false);
+        _element.removeEventListener('dblclick', OnDoubleClick, false);
+
+        _transform_controls.removeEventListener('change', OnChange, false);
+        _controls.removeEventListener('change', OnChange, false);
+      })
 
     }
   }
