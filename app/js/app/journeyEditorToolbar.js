@@ -3,24 +3,141 @@ angular.module('app')
 .directive('journeyEditorToolbar', ['DataManagerSvc', function(DataManagerSvc) {
   return {
     restrict: 'E',
-    templateUrl: 'templates/journey_editor_toolbar.html',
-    controller: ['$scope', 'DataManagerSvc', function($scope, DataManagerSvc) {
+    compile: function() {
 
-      function ObjectToArray(obj) {
-        var ar = [];
+      var template = [
+        {
+          label: 'File',
+          submenu: [
+            {
+              label: 'Save',
+              click: Save,
+              accelerator: 'CmdOrCtrl+S'
+            },
+            {
+              label: 'Load',
+              click: Load,
+              accelerator: 'CmdOrCtrl+L'
+            }
+          ]
+        },
+        {
+          label: 'Edit',
+          submenu: [
+            {
+              label: 'Undo',
+              accelerator: 'CmdOrCtrl+Z',
+              role: 'undo'
+            },
+            {
+              label: 'Redo',
+              accelerator: 'Shift+CmdOrCtrl+Z',
+              role: 'redo'
+            },
+            {
+              type: 'separator'
+            },
+            {
+              label: 'Cut',
+              accelerator: 'CmdOrCtrl+X',
+              role: 'cut'
+            },
+            {
+              label: 'Copy',
+              accelerator: 'CmdOrCtrl+C',
+              role: 'copy'
+            },
+            {
+              label: 'Paste',
+              accelerator: 'CmdOrCtrl+V',
+              role: 'paste'
+            },
+            {
+              label: 'Select All',
+              accelerator: 'CmdOrCtrl+A',
+              role: 'selectall'
+            },
+          ]
+        },
+        {
+          label: 'View',
+          submenu: [
+            {
+              label: 'Reload',
+              accelerator: 'CmdOrCtrl+R',
+              click: function(item, focusedWindow) {
+                if (focusedWindow)
+                  focusedWindow.reload();
+              }
+            },
+            {
+              label: 'Toggle Full Screen',
+              accelerator: (function() {
+                if (process.platform == 'darwin')
+                  return 'Ctrl+Command+F';
+                else
+                  return 'F11';
+              })(),
+              click: function(item, focusedWindow) {
+                if (focusedWindow)
+                  focusedWindow.setFullScreen(!focusedWindow.isFullScreen());
+              }
+            },
+            {
+              label: 'Toggle Developer Tools',
+              accelerator: (function() {
+                if (process.platform == 'darwin')
+                  return 'Alt+Command+I';
+                else
+                  return 'Ctrl+Shift+I';
+              })(),
+              click: function(item, focusedWindow) {
+                if (focusedWindow)
+                  focusedWindow.toggleDevTools();
+              }
+            },
+          ]
+        },
+        {
+          label: 'Window',
+          role: 'window',
+          submenu: [
+            {
+              label: 'Minimize',
+              accelerator: 'CmdOrCtrl+M',
+              role: 'minimize'
+            },
+            {
+              label: 'Close',
+              accelerator: 'CmdOrCtrl+W',
+              role: 'close'
+            },
+          ]
+        },
+        {
+          label: 'Help',
+          role: 'help',
+          submenu: [
+            {
+              label: 'Learn More',
+              click: function() { require('electron').shell.openExternal('http://electron.atom.io') }
+            },
+          ]
+        }
+      ]
 
-        for (key in obj)
-          ar.push(obj[key]);
+      var _remote = require('remote');
+      var _dialog = _remote.require('electron').dialog;
+      var Menu = _remote.Menu;
 
-        return ar;
-      }
+      var _menu = new Menu();
+      _menu = Menu.buildFromTemplate(template);
+      Menu.setApplicationMenu(_menu)
 
       function Save() {
-        var remote = require('remote');
-        var dialog = remote.require('electron').dialog;
-        var fs = remote.require('fs');
+        var fs = _remote.require('fs');
 
-        var file = dialog.showSaveDialog();
+        var file = _dialog.showSaveDialog();
 
         if (typeof file !== 'undefined') {
           fs.open(file, 'w', OnOpen);
@@ -34,39 +151,25 @@ angular.module('app')
 
           var data_journey = DataManagerSvc.GetData();
 
-          var data = {
-            journey: ObjectToArray(data_journey.journey),
-            pois: ObjectToArray(data_journey.pois),
-            channels: ObjectToArray(data_journey.channels),
-            markers: ObjectToArray(data_journey.markers),
-            contents: ObjectToArray(data_journey.contents)
-          }
+          var str = JSON.stringify(data_journey, undefined, 2);
 
-          var str = JSON.stringify(data, undefined, 2);
-
-          fs.write(fd, str, OnWrite);
+          fs.write(fd, str, OnWrite(fd));
 
         }
 
-        function OnWrite(err, written, string) {
-          if (err) {
-            console.error(err);
+        function OnWrite(fd) {
+          return function(err, written, string) {
+            if (err) {
+              console.error(err);
+            }
+            fs.close(fd);
           }
         }
       }
 
       function Load() {
-        var remote = require('remote');
-        var dialog = remote.require('electron').dialog;
-
-        var files = dialog.showOpenDialog({ properties: [ 'openFile', 'multiSelections' ]});
+        var files = _dialog.showOpenDialog({ properties: [ 'openFile', 'multiSelections' ]});
       }
-
-      $scope.Save = Save;
-      $scope.Load = Load;
-
-    }],
-    link: function(scope, element, attrs) {
 
     }
   }

@@ -153,8 +153,15 @@ progress::-webkit-progress-bar {
   border-left: 1px solid;
 }
 
-#preview {
+#editor-3D {
   flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+#transform_channel {
+  flex: 1;
+  box-shadow: 0px 0px 20px 0px rgba(0, 0, 0, 0.5) inset;
 }
 
 #navigation > ul {
@@ -178,7 +185,6 @@ input[type="number"] {
   width: 100%;
   border: 1px solid #222222;
   border-bottom: 2px solid #222222;
-  padding-left: 5px;
 }
 
 input[type="text"].focus,
@@ -188,10 +194,6 @@ input[type="number"]:focus {
   border-color: #444444;
 }
 
-.btn {
-  padding: 5px;
-  width: 100%;
-}
 
 h3 {
   text-align: center;
@@ -221,10 +223,11 @@ ul {
   height: auto;
 }
 
-.button-bar {
-  width: 100%;
+.well {
+  box-shadow: 0px 0px 7px 0px rgba(0, 0, 0, 0.1) inset;
 }
 
-.well {
-  box-shadow: 0px 0px 3px 1px rgba(0, 0, 0, 0.1) inset;
+.btn-list-item {
+  padding: 5px;
+  width: 100%;
 }

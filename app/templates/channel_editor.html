@@ -1,0 +1,43 @@
+<canvas style="
+  position: absolute;
+"></canvas>
+
+
+<div style="
+  position: absolute;
+  height: auto;
+  top: 1em;
+  left: 50%;
+  transform: translate(-50%, 0);">
+
+  {{GetSelectionName()}}
+
+</div>
+
+
+<div style="
+  position: absolute;
+  height: auto;
+  bottom: 1em;
+  left: 50%;
+  transform: translate(-50%, 0);">
+
+  <label class="btn" style="padding: 2px; width: 8ch;
+  margin: 0px; background-color: #eeeeee;"
+  ng-model="mode" uib-btn-radio="'translate'">
+    Move
+  </label>
+
+  <label class="btn" style="padding: 2px; width: 8ch;
+  margin: 0px; background-color: #eeeeee;"
+  ng-model="mode" uib-btn-radio="'rotate'">
+    Rotate
+  </label>
+
+  <label class="btn" style="padding: 2px; width: 8ch;
+  margin: 0px; background-color: #eeeeee;"
+  ng-model="mode" uib-btn-radio="'scale'">
+    Scale
+  </label>
+
+</div>
