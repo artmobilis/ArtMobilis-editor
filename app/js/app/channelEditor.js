@@ -290,7 +290,7 @@ angular.module('app')
         AMTHREE.StopSounds(_scene);
         _transform_controls.detach();
         _marker_mesh.visible = false;
-        _contents_meshes.visible = false;
+        _contents_meshes.remove.apply(_contents_meshes, _contents_meshes.children);
         _selection_box.visible = false;
         _channel = null;
         scope.selection = null;
@@ -305,7 +305,6 @@ angular.module('app')
             _marker_mesh.material.map = texture;
             _marker_mesh.material.needsUpdate = true;
             _marker_mesh.visible = true;
-            _contents_meshes.visible = true;
             AMTHREE.PlayAnimatedTextures(_scene);
             AMTHREE.PlaySounds(_scene);
           });
@@ -352,8 +351,7 @@ angular.module('app')
       }
 
       function LoadContents() {
-        while(_contents_meshes.children.length !== 0)
-          _contents_meshes.remove(_contents_meshes.children[0]);
+        _contents_meshes.remove.apply(_contents_meshes, _contents_meshes.children);
 
         var sphere = new THREE.Sphere();
 
