@@ -305,10 +305,10 @@ angular.module('app')
             _marker_mesh.material.map = texture;
             _marker_mesh.material.needsUpdate = true;
             _marker_mesh.visible = true;
-            AMTHREE.PlayAnimatedTextures(_scene);
-            AMTHREE.PlaySounds(_scene);
           });
         }
+        AMTHREE.PlayAnimatedTextures(_scene);
+        AMTHREE.PlaySounds(_scene);
       }
 
       function Update() {
