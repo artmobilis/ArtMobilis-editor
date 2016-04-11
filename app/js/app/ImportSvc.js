@@ -281,6 +281,7 @@ angular.module('app')
     function OnLoadFile(err, data) {
       if (err) {
         console.warn(err);
+        return;
       }
 
       try {
