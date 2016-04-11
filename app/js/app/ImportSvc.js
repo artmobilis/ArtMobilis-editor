@@ -76,7 +76,7 @@ angular.module('app')
 
     function AddPlane(path, texture) {
       var geometry = PLANE_GEOMETRY_UNIT;
-      var material = new THREE.MeshBasicMaterial( { side: 2, map: texture } );
+      var material = new THREE.MeshBasicMaterial( { side: 2, map: texture, transparent: true } );
       var object = new THREE.Mesh(geometry, material);
       object.name = GetName(path);
 
