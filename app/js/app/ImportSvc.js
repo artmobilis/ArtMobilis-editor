@@ -38,7 +38,7 @@ angular.module('app')
 
     function ImportMarker() {
       var files = _dialog.showOpenDialog( {
-        properties: ['openFile'],
+        properties: ['openFile', 'multiSelections'],
         filters: [
           {
             name: 'JPEG image',
@@ -47,22 +47,29 @@ angular.module('app')
         ]
       });
 
-      if (typeof files !== 'undefined' && files.length === 1) {
+      if (typeof files !== 'undefined') {
+        for (var i = 0, c = files.length; i < c; ++i) {
 
-        var path = files[0];
-        var filename = GetFilename(path);
-        var root = ProjectsManagerSvc.GetRoot();
-        var new_dir = root + '/' + AMTHREE.IMAGE_PATH;
-        var new_path = new_dir + filename;
+          function MarkerImporter(path) {
+            var filename = GetFilename(path);
+            var root = ProjectsManagerSvc.GetRoot();
+            var new_dir = root + '/' + AMTHREE.IMAGE_PATH;
+            var new_path = new_dir + filename;
 
-        if (!FileSystemSvc.FileExists(new_path)) {
-          FileSystemSvc.CopyFile(path, new_path, function() {
-            AddMarker(filename, new_path);
-          });
+            if (!FileSystemSvc.FileExists(new_path)) {
+              FileSystemSvc.CopyFile(path, new_path).then(function() {
+                AddMarker(filename, new_path);
+              }).catch(function(err) {
+                console.warn(err);
+              });
+            }
+            else
+              AddMarker(filename, new_path);
+          }
+
+          (new MarkerImporter(files[i]));
+
         }
-        else
-          AddMarker(filename, new_path);
-
       }
     }
 
@@ -153,65 +160,77 @@ angular.module('app')
 
       if (typeof files !== 'undefined') {
         for (var i = 0, c = files.length; i < c; ++i) {
-          var path = files[i];
-          var filename = GetFilename(path);
-          var root = ProjectsManagerSvc.GetRoot();
-          var extension = filename.slice(filename.lastIndexOf('.') + 1);
 
-          switch (extension) {
-            case 'jpg':
-            case 'jpeg':
-            var local_path = AMTHREE.IMAGE_PATH + filename;
-            var new_path = root + '/' + local_path;
-            if (FileSystemSvc.FileExists(new_path))
-              AddPlaneJpg(new_path);
-            else {
-              FileSystemSvc.CopyFile(path, new_path, function() {
+          function PlaneImporter(path) {
+            var filename = GetFilename(path);
+            var root = ProjectsManagerSvc.GetRoot();
+            var extension = filename.slice(filename.lastIndexOf('.') + 1);
+
+            switch (extension) {
+              case 'jpg':
+              case 'jpeg':
+              var local_path = AMTHREE.IMAGE_PATH + filename;
+              var new_path = root + '/' + local_path;
+              if (FileSystemSvc.FileExists(new_path))
                 AddPlaneJpg(new_path);
-              });
-            }
-            break;
+              else {
+                FileSystemSvc.CopyFile(path, new_path).then(function() {
+                  AddPlaneJpg(new_path);
+                }).catch(function(err) {
+                  console.warn(err);
+                });
+              }
+              break;
 
-            case 'gif':
-            var local_path = AMTHREE.IMAGE_PATH + filename;
-            var new_path = root + '/' + local_path;
-            if (FileSystemSvc.FileExists(new_path))
-              AddPlaneGif(new_path);
-            else {
-              FileSystemSvc.CopyFile(path, new_path, function() {
+              case 'gif':
+              var local_path = AMTHREE.IMAGE_PATH + filename;
+              var new_path = root + '/' + local_path;
+              if (FileSystemSvc.FileExists(new_path))
                 AddPlaneGif(new_path);
-              });
-            }
-            break;
+              else {
+                FileSystemSvc.CopyFile(path, new_path).then(function() {
+                  AddPlaneGif(new_path);
+                }).catch(function(err) {
+                  console.warn(err);
+                });
+              }
+              break;
 
-            case 'mp4':
-            var local_path = AMTHREE.VIDEO_PATH + filename;
-            var new_path = root + '/' + local_path;
-            if (FileSystemSvc.FileExists(new_path))
-              AddPlaneMp4(new_path);
-            else {
-              FileSystemSvc.CopyFile(path, new_path, function() {
+              case 'mp4':
+              var local_path = AMTHREE.VIDEO_PATH + filename;
+              var new_path = root + '/' + local_path;
+              if (FileSystemSvc.FileExists(new_path))
                 AddPlaneMp4(new_path);
-              });
-            }
-            break;
+              else {
+                FileSystemSvc.CopyFile(path, new_path).then(function() {
+                  AddPlaneMp4(new_path);
+                }).catch(function(err) {
+                  console.warn(err);
+                });
+              }
+              break;
 
-            case 'mp3':
-            var local_path = AMTHREE.SOUND_PATH + filename;
-            var new_path = root + '/' + local_path;
-            if (FileSystemSvc.FileExists(new_path))
-              AddSoundObject(new_path);
-            else {
-              FileSystemSvc.CopyFile(path, new_path, function() {
+              case 'mp3':
+              var local_path = AMTHREE.SOUND_PATH + filename;
+              var new_path = root + '/' + local_path;
+              if (FileSystemSvc.FileExists(new_path))
                 AddSoundObject(new_path);
-              });
-            }
-            break;
+              else {
+                FileSystemSvc.CopyFile(path, new_path).then(function() {
+                  AddSoundObject(new_path);
+                }).catch(function(err) {
+                  console.warn(err);
+                });
+              }
+              break;
 
-            default:
-            console.warn('failed to import file: invalid file extension', path);
-            break;
+              default:
+              console.warn('failed to import file: invalid file extension', path);
+              break;
+            }
           }
+
+          (new PlaneImporter(files[i]));
 
         }
       }
