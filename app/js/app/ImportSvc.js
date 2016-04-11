@@ -274,35 +274,27 @@ angular.module('app')
         ProjectsManagerSvc.SetRoot(root);
 
         var config_file = root + '/journey.json';
-        _fs.readFile(config_file, 'utf8', OnLoadFile);
+        FileSystemSvc.ReadFile(config_file).then(OnLoadFile).catch(function(err) {
+          console.warn('failed to open project: ', err);
+        });
       }
     }
 
-    function OnLoadFile(err, data) {
-      if (err) {
-        console.warn(err);
-        return;
-      }
+    function OnLoadFile(data) {
+      var json = JSON.parse(data);
+      json.objects = json.objects || {};
+      json.objects.constants = json.objects.constants || {};
+      json.objects.constants.asset_path = ProjectsManagerSvc.GetRoot();
+      DataManagerSvc.Clear();
+      DataManagerSvc.ParseData(json, 'data_journey');
 
-      try {
-        var json = JSON.parse(data);
-        json.objects = json.objects || {};
-        json.objects.constants = json.objects.constants || {};
-        json.objects.constants.asset_path = ProjectsManagerSvc.GetRoot();
-        DataManagerSvc.Clear();
-        DataManagerSvc.ParseData(json, 'data_journey');
-
-        DataManagerSvc.GetLoadPromise().then(function() {
-          var markers = DataManagerSvc.GetData().markers
-          for (var id in markers) {
-            var elem = markers[id];
-            elem.url = ProjectsManagerSvc.GetRoot() + '/' + AMTHREE.IMAGE_PATH + elem.url;
-          }
-        });
-      }
-      catch (e) {
-        console.warn('failed to open project: ', e);
-      }
+      DataManagerSvc.GetLoadPromise().then(function() {
+        var markers = DataManagerSvc.GetData().markers
+        for (var id in markers) {
+          var elem = markers[id];
+          elem.url = ProjectsManagerSvc.GetRoot() + '/' + AMTHREE.IMAGE_PATH + elem.url;
+        }
+      });
     }
 
     this.ImportMarkers = ImportMarkers;
