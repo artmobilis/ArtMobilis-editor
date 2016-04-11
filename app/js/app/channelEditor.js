@@ -4,7 +4,8 @@ angular.module('app')
   return {
     restrict: 'AE',
     scope: {
-      channel_id: '@channelId'
+      channel_id: '@channelId',
+      active: '@'
     },
     templateUrl: "templates/channel_editor.html",
     link: function(scope, element, attr) {
@@ -415,49 +416,67 @@ angular.module('app')
         _transform_controls.setMode(mode);
       });
 
-
-      (function Run() {
-        _running = true;
-        function Loop() {
-          if (_running) {
-            window.requestAnimationFrame(Loop);
-            CheckCanvasSize();
-            Update();
-            Render();
-          }
-        };
-        Loop();
-      })();
+      scope.$watch('active', function(active) {
+        if (active === 'true') {
+          Run();
+        }
+        else if (active === 'false') {
+          Stop();
+        }
+      });
 
 
-      window.addEventListener('resize', OnWindowResize, false);
-      OnWindowResize();
+      function Stop() {
+        if (_running) {
+          window.removeEventListener('resize', OnWindowResize, false);
 
-      _canvas.addEventListener('mousedown', OnMouseDown, false);
-      _canvas.addEventListener('touchstart', OnTouchStart, false);
-      _canvas.addEventListener('dblclick', OnDoubleClick, false);
+          _canvas.removeEventListener('mousedown', OnMouseDown, false);
+          _canvas.removeEventListener('touchstart', OnTouchStart, false);
+          _canvas.removeEventListener('dblclick', OnDoubleClick, false);
 
-      _transform_controls.addEventListener('change', OnTransformChange, false);
-      _transform_controls.addEventListener('mouseDown', OnTransformControlsMouseDown);
-      _transform_controls.addEventListener('mouseUp', OnTransformControlsMouseUp);
+          _transform_controls.removeEventListener('change', OnTransformChange, false);
+          _transform_controls.removeEventListener('mouseDown', OnTransformControlsMouseDown);
+          _transform_controls.removeEventListener('mouseUp', OnTransformControlsMouseUp);
 
-      _controls.addEventListener('change', OnControlsChange, false);
+          _controls.removeEventListener('change', OnControlsChange, false);
 
+          _running = false;
+        }
+      }
+
+      function Run() {
+        if (!_running) {
+          _running = true;
+
+          window.addEventListener('resize', OnWindowResize, false);
+          OnWindowResize();
+
+          _canvas.addEventListener('mousedown', OnMouseDown, false);
+          _canvas.addEventListener('touchstart', OnTouchStart, false);
+          _canvas.addEventListener('dblclick', OnDoubleClick, false);
+
+          _transform_controls.addEventListener('change', OnTransformChange, false);
+          _transform_controls.addEventListener('mouseDown', OnTransformControlsMouseDown);
+          _transform_controls.addEventListener('mouseUp', OnTransformControlsMouseUp);
+
+          _controls.addEventListener('change', OnControlsChange, false);
+
+          function Loop() {
+            if (_running) {
+              window.requestAnimationFrame(Loop);
+              CheckCanvasSize();
+              Update();
+              Render();
+            }
+          };
+          Loop();
+        }
+      };
+
+      Run();
 
       scope.$on('$destroy', function() {
-        window.removeEventListener('resize', OnWindowResize, false);
-
-        _canvas.removeEventListener('mousedown', OnMouseDown, false);
-        _canvas.removeEventListener('touchstart', OnTouchStart, false);
-        _canvas.removeEventListener('dblclick', OnDoubleClick, false);
-
-        _transform_controls.removeEventListener('change', OnTransformChange, false);
-        _transform_controls.removeEventListener('mouseDown', OnTransformControlsMouseDown);
-        _transform_controls.removeEventListener('mouseUp', OnTransformControlsMouseUp);
-
-        _controls.removeEventListener('change', OnControlsChange, false);
-
-        _running = false;
+        Stop();
       })
 
     }
