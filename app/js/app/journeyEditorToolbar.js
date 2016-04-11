@@ -35,8 +35,8 @@ angular.module('app')
               accelerator: 'CmdOrCtrl+S'
             },
             {
-              label: 'Import marker...',
-              click: ImportMarker,
+              label: 'Import markers...',
+              click: ImportMarkers,
               accelerator: 'CmdOrCtrl+M'
             },
             {
@@ -175,8 +175,8 @@ angular.module('app')
         ImportSvc.Open();
       }
 
-      function ImportMarker() {
-        ImportSvc.ImportMarker();
+      function ImportMarkers() {
+        ImportSvc.ImportMarkers();
       }
 
       function ImportFilesAsPlanes() {

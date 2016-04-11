@@ -36,42 +36,43 @@ angular.module('app')
       DataManagerSvc.NotifyChange('marker', marker.uuid);
     }
 
-    function ImportMarker() {
-      var files = _dialog.showOpenDialog( {
-        properties: ['openFile', 'multiSelections'],
-        filters: [
-          {
-            name: 'JPEG image',
-            extensions: ['jpg', 'jpeg']
-          }
-        ]
-      });
+    var ImportMarkers = function() {
 
-      if (typeof files !== 'undefined') {
-        for (var i = 0, c = files.length; i < c; ++i) {
+      function MarkersImporter(path) {
+        var filename = GetFilename(path);
+        var root = ProjectsManagerSvc.GetRoot();
+        var new_dir = root + '/' + AMTHREE.IMAGE_PATH;
+        var new_path = new_dir + filename;
 
-          function MarkerImporter(path) {
-            var filename = GetFilename(path);
-            var root = ProjectsManagerSvc.GetRoot();
-            var new_dir = root + '/' + AMTHREE.IMAGE_PATH;
-            var new_path = new_dir + filename;
+        if (!FileSystemSvc.FileExists(new_path)) {
+          FileSystemSvc.CopyFile(path, new_path).then(function() {
+            AddMarker(filename, new_path);
+          }).catch(function(err) {
+            console.warn(err);
+          });
+        }
+        else
+          AddMarker(filename, new_path);
+      }
 
-            if (!FileSystemSvc.FileExists(new_path)) {
-              FileSystemSvc.CopyFile(path, new_path).then(function() {
-                AddMarker(filename, new_path);
-              }).catch(function(err) {
-                console.warn(err);
-              });
+      return function() {
+        var files = _dialog.showOpenDialog( {
+          properties: ['openFile', 'multiSelections'],
+          filters: [
+            {
+              name: 'JPEG image',
+              extensions: ['jpg', 'jpeg']
             }
-            else
-              AddMarker(filename, new_path);
+          ]
+        });
+
+        if (typeof files !== 'undefined') {
+          for (var i = 0, c = files.length; i < c; ++i) {
+            (new MarkersImporter(files[i]));
           }
-
-          (new MarkerImporter(files[i]));
-
         }
       }
-    }
+    }();
 
     function AddPlane(path, texture) {
       var geometry = PLANE_GEOMETRY_UNIT;
@@ -303,7 +304,7 @@ angular.module('app')
       }
     }
 
-    this.ImportMarker = ImportMarker;
+    this.ImportMarkers = ImportMarkers;
     this.ImportImageJpg = ImportImageJpg;
     this.ImportImageGif = ImportImageGif;
     this.ImportFilesAsPlanes = ImportFilesAsPlanes;
