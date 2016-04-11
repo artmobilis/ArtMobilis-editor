@@ -1,9 +1,20 @@
 angular.module('app')
 
-.controller('JourneyEditorCtrl', ['$scope', '$timeout', 'DataManagerSvc', 'dataJourneyFactory', 'emptyAssetFactory',
-  function($scope, $timeout, DataManagerSvc, dataJourneyFactory, emptyAssetFactory) {
+.controller('JourneyEditorCtrl', [
+  '$scope',
+  '$timeout',
+  'DataManagerSvc',
+  'dataJourneyFactory',
+  'emptyAssetFactory',
+  'ProjectsManagerSvc',
+  function($scope,
+    $timeout,
+    DataManagerSvc,
+    dataJourneyFactory,
+    emptyAssetFactory,
+    ProjectsManagerSvc) {
 
-  var selection = {
+  var _selection = {
     model: 'journey',
     type: null,
     id: null,
@@ -13,17 +24,21 @@ angular.module('app')
   $scope.edit_mode = '';
   $scope.GetJourney = null;
 
-  $scope.selection = selection;
+  $scope.selection = _selection;
 
   $scope.drag = {
     type: null,
     id: null
   }
 
+  $scope.state = {
+    active: false
+  }
+
   function OnChannelUpdated() {
     $timeout(function() {
-      var type = selection.type;
-      var id = selection.id;
+      var type = _selection.type;
+      var id = _selection.id;
       ResetSelection();
       $timeout(function() {
         SetSelection(type, id);
@@ -32,7 +47,7 @@ angular.module('app')
   }
 
   function ResetSelection() {
-    selection.model = 'journey';
+    _selection.model = 'journey';
     OnAssetSelectionChange();
   }
 
@@ -62,18 +77,18 @@ angular.module('app')
 
   function OnAssetSelectionChange() {
     var journey_data = DataManagerSvc.GetData();
-    var model = $scope.selection.model;
+    var model = _selection.model;
 
     var slice = SliceAssetId(model);
     if (slice.type === 'journey') {
-      $scope.selection.elem = journey_data.journey;
+      _selection.elem = journey_data.journey;
     }
     else {
-      $scope.selection.elem = journey_data[slice.type][slice.id];
+      _selection.elem = journey_data[slice.type][slice.id];
     }
 
-    $scope.selection.type = slice.type;
-    $scope.selection.id   = slice.id;
+    _selection.type = slice.type;
+    _selection.id   = slice.id;
   }
 
   function AllowDrop(event) {
@@ -135,9 +150,9 @@ angular.module('app')
     var data = event.dataTransfer.getData('Text');
     var slice = SliceAssetId(data);
 
-    var fun = drop_fctns[selection.type];
+    var fun = drop_fctns[_selection.type];
     if (typeof fun !== 'undefined') {
-      fun(selection.elem, slice.type, slice.id);
+      fun(_selection.elem, slice.type, slice.id);
       $timeout();
     }
   }
@@ -187,12 +202,12 @@ angular.module('app')
   }
 
   function SetSelection(type, id) {
-    selection.model = type + '_' + id;
+    _selection.model = type + '_' + id;
   }
 
   function Delete() {
     var data_jouney = DataManagerSvc.GetData();
-    var container = data_jouney[selection.type];
+    var container = data_jouney[_selection.type];
 
     var previous;
     var next;
@@ -202,18 +217,18 @@ angular.module('app')
         next = id;
         break;
       }
-      if (id === selection.id) {
+      if (id === _selection.id) {
         found = true;
         continue;
       }
       previous = id;
     }
     if (found) {
-      delete container[selection.id];
+      delete container[_selection.id];
       if (next)
-        SetSelection(selection.type, next);
+        SetSelection(_selection.type, next);
       else if (previous)
-        SetSelection(selection.type, previous);
+        SetSelection(_selection.type, previous);
       else
         ResetSelection();
 
@@ -267,19 +282,37 @@ angular.module('app')
     var data = event.dataTransfer.getData('Text');
     var slice = SliceAssetId(data);
 
-    var fun = detach_fctns[selection.type];
+    var fun = detach_fctns[_selection.type];
     if (fun)
-      fun(selection.elem, slice.type, slice.id);
+      fun(_selection.elem, slice.type, slice.id);
     $timeout();
   }
 
-  DataManagerSvc.GetLoadPromise().then(function() {
+  function OnDataChange(type, id) {
+    if (typeof type !== 'undefined') {
+      if (type === 'channel' && _selection.type === 'channels') {
+        if (typeof id === 'undefined' || id === _selection.id)
+          OnChannelUpdated();
+      }
+      else if (type === 'data_journey')
+        ResetSelection();
+    }
+    else {
+      ResetSelection();
+    }
     SetJourney();
-    ResetSelection();
     $timeout();
-  }, function(e) {
-    console.log(e);
-  });
+  }
+
+  function OnProjectChange() {
+    $scope.state.active = !ProjectsManagerSvc.IsEmpty();
+    $timeout();
+  }
+
+  DataManagerSvc.AddListenerDataChange(OnDataChange);
+
+  ProjectsManagerSvc.AddListenerChange(OnProjectChange);
+  OnProjectChange();
 
   ResetSelection();
 
@@ -300,5 +333,10 @@ angular.module('app')
   $scope.NewObject = NewObject;
   $scope.Delete = Delete;
   $scope.Detach = Detach;
+
+  $scope.$on('$destroy', function() {
+    DataManagerSvc.RemoveListenerDataChange(OnDataChange);
+    ProjectsManagerSvc.RemoveListenerChange(OnProjectChange);
+  })
 
 }])
