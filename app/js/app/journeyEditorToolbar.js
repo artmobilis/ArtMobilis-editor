@@ -35,8 +35,8 @@ angular.module('app')
               accelerator: 'CmdOrCtrl+S'
             },
             {
-              label: 'Import marker...',
-              click: ImportMarker,
+              label: 'Import markers...',
+              click: ImportMarkers,
               accelerator: 'CmdOrCtrl+M'
             },
             {
@@ -126,7 +126,7 @@ angular.module('app')
                 if (process.platform == 'darwin')
                   return 'Alt+Command+I';
                 else
-                  return 'Ctrl+Shift+I';
+                  return 'F12';
               })(),
               click: function(item, focusedWindow) {
                 if (focusedWindow)
@@ -175,8 +175,8 @@ angular.module('app')
         ImportSvc.Open();
       }
 
-      function ImportMarker() {
-        ImportSvc.ImportMarker();
+      function ImportMarkers() {
+        ImportSvc.ImportMarkers();
       }
 
       function ImportFilesAsPlanes() {

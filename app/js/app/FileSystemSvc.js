@@ -6,33 +6,40 @@ angular.module('app')
   var _fs = _remote.require('fs');
 
 
-  function CopyFile(source, target, on_end) {
-    var on_end_called = false;
+  function CopyFile(source, target) {
+    return new Promise(function(resolve, reject) {
 
-    if (!FileExists(source)) {
-      console.warn('no such file', source);
-      return;
-    }
+      var ended = false;
 
-    var rd = _fs.createReadStream(source);
-    rd.on("error", function(err) {
-      Done(err);
-    });
-    var wr = _fs.createWriteStream(target);
-    wr.on("error", function(err) {
-      Done(err);
-    });
-    wr.on("close", function(ex) {
-      Done();
-    });
-    rd.pipe(wr);
-
-    function Done(err) {
-      if (!on_end_called) {
-        on_end(err);
-        on_end_called = true;
+      if (!FileExists(source)) {
+        reject('no such file', source);
+        return;
       }
-    }
+
+      var rd = _fs.createReadStream(source);
+      rd.on("error", function(err) {
+        Done(err);
+      });
+      var wr = _fs.createWriteStream(target);
+      wr.on("error", function(err) {
+        Done(err);
+      });
+      wr.on("close", function(ex) {
+        Done();
+      });
+      rd.pipe(wr);
+
+      function Done(err) {
+        if (!ended) {
+          ended = true;
+          if (err)
+            reject(err);
+          else
+            resolve();
+        }
+      }
+      
+    });
   }
 
   function FileExists(path) {
@@ -80,11 +87,25 @@ angular.module('app')
     return RealPath(path1) === RealPath(path2);
   }
 
+  function ReadFile(path) {
+    return new Promise(function(resolve, reject) {
+      _fs.readFile(path, 'utf8', function(err, data) {
+        if (!err) {
+          resolve(data);
+        }
+        else {
+          reject(err);
+        }
+      });
+    });
+  }
+
   this.CopyFile = CopyFile;
   this.CreateDir = CreateDir;
   this.RealPath = RealPath;
   this.CompPath = CompPath;
   this.FileExists = FileExists;
+  this.ReadFile = ReadFile;
 
 
 })
