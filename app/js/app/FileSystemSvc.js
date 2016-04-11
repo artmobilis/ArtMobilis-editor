@@ -87,11 +87,25 @@ angular.module('app')
     return RealPath(path1) === RealPath(path2);
   }
 
+  function ReadFile(path) {
+    return new Promise(function(resolve, reject) {
+      _fs.readFile(path, 'utf8', function(err, data) {
+        if (!err) {
+          resolve(data);
+        }
+        else {
+          reject(err);
+        }
+      });
+    });
+  }
+
   this.CopyFile = CopyFile;
   this.CreateDir = CreateDir;
   this.RealPath = RealPath;
   this.CompPath = CompPath;
   this.FileExists = FileExists;
+  this.ReadFile = ReadFile;
 
 
 })
