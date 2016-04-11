@@ -78,10 +78,15 @@
     </div>
 
 
-    <div id="editor-3D" droppable drop="Drop">
+    <div id="editor-3D" droppable drop="Drop" ng-show="selection.type !== 'journey'">
       <channel-editor id="transform_channel"
-      channel-id="{{selection.type === 'channels' ? selection.id : null}}">
+      channel-id="{{selection.type === 'channels' ? selection.id : null}}"
+      active="{{selection.type !== 'journey'}}">
       </channel-editor>
+    </div>
+
+    <div id="journey-preview" ng-show="selection.type === 'journey'">
+      Preview journey
     </div>
 
 
