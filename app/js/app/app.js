@@ -1,7 +1,7 @@
 angular.module('app')
 
 .run(['DataManagerSvc', function(DataManagerSvc) {
-  DataManagerSvc.LoadPresets();
+  // DataManagerSvc.LoadPresets();
 }])
 
 .config(['$stateProvider', '$urlRouterProvider', function($stateProvider, $urlRouterProvider) {
