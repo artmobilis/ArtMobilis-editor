@@ -1,23 +1,60 @@
 angular.module('app')
 
-.directive('journeyEditorToolbar', ['DataManagerSvc', function(DataManagerSvc) {
+.directive('journeyEditorToolbar', [
+  'DataManagerSvc',
+  'dataJourneyFactory',
+  'ImportSvc',
+  'ExportSvc',
+  'ProjectsManagerSvc',
+  function(DataManagerSvc,
+    dataJourneyFactory,
+    ImportSvc,
+    ExportSvc,
+    ProjectsManagerSvc) {
   return {
     restrict: 'E',
-    compile: function() {
+    link: function($scope, $element, $attr) {
 
       var template = [
         {
           label: 'File',
           submenu: [
             {
+              label: 'New...',
+              click: New,
+              accelerator: 'CmdOrCtrl+N'
+            },
+            {
+              label: 'Open...',
+              click: Open,
+              accelerator: 'CmdOrCtrl+L'
+            },
+            {
               label: 'Save',
               click: Save,
               accelerator: 'CmdOrCtrl+S'
             },
             {
-              label: 'Load',
-              click: Load,
-              accelerator: 'CmdOrCtrl+L'
+              label: 'Import marker...',
+              click: ImportMarker,
+              accelerator: 'CmdOrCtrl+M'
+            },
+            {
+              label: 'Import objects',
+              submenu: [
+                {
+                  label: 'Image, video, sound...',
+                  click: ImportFilesAsPlanes
+                },
+                {
+                  label: 'Model 3D...',
+                  click: ImportObjects3D
+                }
+              ]
+            },
+            {
+              label: 'Close project',
+              click: CloseProject
             }
           ]
         },
@@ -132,45 +169,52 @@ angular.module('app')
 
       var _menu = new Menu();
       _menu = Menu.buildFromTemplate(template);
-      Menu.setApplicationMenu(_menu)
+      Menu.setApplicationMenu(_menu);
+
+      function Open() {
+        ImportSvc.Open();
+      }
+
+      function ImportMarker() {
+        ImportSvc.ImportMarker();
+      }
+
+      function ImportFilesAsPlanes() {
+        ImportSvc.ImportFilesAsPlanes();
+      }
+
+      function ImportObjects3D() {
+        // ImportSvc.ImportObjects3D();
+      }
+
+      function New() {
+        ExportSvc.New();
+      }
 
       function Save() {
-        var fs = _remote.require('fs');
-
-        var file = _dialog.showSaveDialog();
-
-        if (typeof file !== 'undefined') {
-          fs.open(file, 'w', OnOpen);
-        }
-
-        function OnOpen(err, fd) {
-          if (err) {
-            console.error(err);
-            return;
-          }
-
-          var data_journey = DataManagerSvc.GetData();
-
-          var str = JSON.stringify(data_journey, undefined, 2);
-
-          fs.write(fd, str, OnWrite(fd));
-
-        }
-
-        function OnWrite(fd) {
-          return function(err, written, string) {
-            if (err) {
-              console.error(err);
-            }
-            fs.close(fd);
-          }
-        }
+        ExportSvc.Save();
       }
 
-      function Load() {
-        var files = _dialog.showOpenDialog({ properties: [ 'openFile', 'multiSelections' ]});
+      function CloseProject() {
+        ProjectsManagerSvc.Close();
+        DataManagerSvc.Clear();
       }
 
+      function OnProjectChange() {
+        var active = !ProjectsManagerSvc.IsEmpty();
+        var file_menu_items = _menu.items[0].submenu.items;
+        file_menu_items[2].enabled = active;
+        file_menu_items[3].enabled = active;
+        file_menu_items[4].enabled = active;
+        file_menu_items[5].enabled = active;
+      }
+
+      ProjectsManagerSvc.AddListenerChange(OnProjectChange);
+      OnProjectChange();
+
+      $scope.$on('$destroy', function() {
+        ProjectsManagerSvc.RemoveListenerChange(OnProjectChange);
+      })
     }
   }
 }])
