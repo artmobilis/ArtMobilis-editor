@@ -6,6 +6,9 @@
 
   <div id="content">
 
+    <div id="grey_screen" class="grey_box" ng-hide="state.active">
+    </div>
+
     <div id="navigation">
 
       
@@ -68,7 +71,6 @@
             <span ng-include="'templates/drag_icon.html'"></span>
             {{value.name || key}}
           </label>
-          <div ng-include="'templates/new_button.html'" ng-click="NewObject()"></div>
         </uib-accordion-group>
       </uib-accordion>
 
