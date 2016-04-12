@@ -12,6 +12,8 @@ var paths = {
   artmobilis_js_ngmodules_src: ['../ArtMobilis-js-ngmodules/modules/**/*']
 };
 
+gulp.task('default', ['minify-artmobilib', 'copy-ngmodules']);
+
 gulp.task('serve', function () {
   electron.start();
   gulp.watch('index.js', electron.restart);
