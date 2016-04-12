@@ -14,7 +14,7 @@ var paths = {
 
 gulp.task('default', ['minify-artmobilib', 'copy-ngmodules']);
 
-gulp.task('serve', function () {
+gulp.task('serve', ['minify-artmobilib', 'copy-ngmodules'], function () {
   electron.start();
   gulp.watch('index.js', electron.restart);
   gulp.watch('app/**/*', electron.reload);
