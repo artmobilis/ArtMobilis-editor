@@ -241,7 +241,7 @@ angular.module('app')
       poi.channels.splice(id, 1);
     }
     else if (type === 'poi-channel-object') {
-      poi.channels[id].object = null;
+      delete poi.channels[id].object;
     }
   }
 

@@ -292,7 +292,7 @@ angular.module('app')
         var markers = DataManagerSvc.GetData().markers
         for (var id in markers) {
           var elem = markers[id];
-          elem.url = ProjectsManagerSvc.GetRoot() + '/' + AMTHREE.IMAGE_PATH + elem.url;
+          elem.url = ProjectsManagerSvc.GetRoot() + '/' + AMTHREE.IMAGE_PATH + GetFilename(elem.url);
         }
       });
     }
