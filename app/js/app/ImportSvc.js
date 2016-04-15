@@ -237,33 +237,37 @@ angular.module('app')
       }
     }
 
-    function ImportObjects3D() {
-      var files = _dialog.showOpenDialog( {
-        properties: ['openFile', 'multiSelections'],
-        filters: [
-          {
-            name: 'Image, video, sound',
-            extensions: ['json']
+    var ImportObjects3D = function() {
+
+      function ObjectImporter(path) {
+        var objects = DataManagerSvc.GetData().objects;
+
+        dataJourneyFactory.objectFactory.Load(path).then(function(object) {
+          objects[object.uuid] = object;
+          DataManagerSvc.NotifyChange('object', object.uuid);
+        }, function(e) {
+          console.log('failed to load object', e);
+        });
+      }
+
+      return function() {
+        var files = _dialog.showOpenDialog( {
+          properties: ['openFile', 'multiSelections'],
+          filters: [
+            {
+              name: 'Threejs object',
+              extensions: ['json']
+            }
+          ]
+        });
+
+        if (typeof files !== 'undefined') {
+          for (var i = 0, c = files.length; i < c; ++i) {
+            (new ObjectImporter(files[i]));
           }
-        ]
-      });
-
-      if (typeof files !== 'undefined') {
-        for (var i = 0, c = files.length; i < c; ++i) {
-
-          var path = files[i];
-          var objects = DataManagerSvc.GetData().objects;
-
-          dataJourneyFactory.objectFactory.Load(path).then(function(object) {
-            objects[object.uuid] = object;
-            DataManagerSvc.NotifyChange('object', object.uuid);
-          }, function(e) {
-            console.log('failed to load object', e);
-          });
-
         }
       }
-    }
+    }();
 
     function Open() {
       var files = _dialog.showOpenDialog({ properties: ['openDirectory']});
