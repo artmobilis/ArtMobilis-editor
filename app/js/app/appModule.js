@@ -4,6 +4,7 @@ angular.module('app', [
   'ngAnimate',
   'data',
   'dataLoading',
+  'journey',
   'uuid4'
   ]
 );
