@@ -57,6 +57,7 @@ angular.module('app')
 
       return function() {
         var files = _dialog.showOpenDialog( {
+          title: 'Import markers',
           properties: ['openFile', 'multiSelections'],
           filters: [
             {
@@ -150,6 +151,7 @@ angular.module('app')
 
     function ImportFilesAsPlanes() {
       var files = _dialog.showOpenDialog( {
+        title: 'Import objects',
         properties: ['openFile', 'multiSelections'],
         filters: [
           {
@@ -252,6 +254,7 @@ angular.module('app')
 
       return function() {
         var files = _dialog.showOpenDialog( {
+          title: 'Import models 3D',
           properties: ['openFile', 'multiSelections'],
           filters: [
             {
@@ -270,7 +273,10 @@ angular.module('app')
     }();
 
     function Open() {
-      var files = _dialog.showOpenDialog({ properties: ['openDirectory']});
+      var files = _dialog.showOpenDialog({
+        title: 'Open',
+        properties: ['openDirectory']
+      });
 
       if (typeof files !== 'undefined' && files.length === 1) {
         var root = files[0];
