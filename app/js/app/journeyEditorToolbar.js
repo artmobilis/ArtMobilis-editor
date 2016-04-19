@@ -184,7 +184,7 @@ angular.module('app')
       }
 
       function ImportObjects3D() {
-        // ImportSvc.ImportObjects3D();
+        ImportSvc.ImportObjects3D();
       }
 
       function New() {

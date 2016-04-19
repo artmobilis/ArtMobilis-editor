@@ -60,6 +60,7 @@
 
     function New() {
       var files = _dialog.showOpenDialog( {
+        title: 'New',
         properties: ['openDirectory']
       });
 
