@@ -128,6 +128,7 @@ angular.module('app')
           DataManagerSvc.AddListenerDataChange(OnDataChange);
 
           JourneySceneSvc.Start(false);
+          _journey_renderer.Start();
 
           _pointer_lock.AddLockListener(OnPointerLock);
           _pointer_lock.AddUnlockListener(OnPointerUnlock);
@@ -165,6 +166,8 @@ angular.module('app')
           JourneySceneSvc.Stop();
           _ctx.fillStyle = 'white';
           _ctx.fillRect(0, 0, _canvas.width, _canvas.height);
+
+          _journey_renderer.Stop();
 
           _camera_video_element.removeEventListener('loadedmetadata', OnCamLoaded, false);
           DataManagerSvc.RemoveListenerDataChange(OnDataChange);
