@@ -7,8 +7,12 @@ angular.module('app')
   var _root;
   var _event_manager = new AM.EventManager();
 
+  function ReplaceBackslashBySlash(path) {
+    return path.replace(/\\/g, '/');
+  }
+
   function SetRoot(root) {
-    _root = root;
+    _root = ReplaceBackslashBySlash(root);
     FireEventChange();
   }
 
