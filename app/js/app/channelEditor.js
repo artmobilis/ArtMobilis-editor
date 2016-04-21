@@ -393,9 +393,9 @@ angular.module('app')
       _scene.add(_contents_meshes);
       _scene.add(_marker_mesh);
 
-      _scene_helpers.add(_transform_controls);
+      _scene.add(_grid);
 
-      _scene_helpers.add(_grid);
+      _scene_helpers.add(_transform_controls);
 
 
 
