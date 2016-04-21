@@ -17,6 +17,14 @@ angular.module('app')
       return path.split('/').pop().split('\\').pop();
     }
 
+    function GetExtension(path) {
+      return path.slice(path.lastIndexOf('.') + 1).toLowerCase();
+    }
+
+    function ReplaceBackslashBySlash(path) {
+      return path.replace(/\\/g, '/');
+    }
+
     function GetName(path) {
       var filename = GetFilename(path);
       return filename.slice(0, filename.lastIndexOf('.'));
@@ -167,7 +175,7 @@ angular.module('app')
           function PlaneImporter(path) {
             var filename = GetFilename(path);
             var root = ProjectsManagerSvc.GetRoot();
-            var extension = filename.slice(filename.lastIndexOf('.') + 1);
+            var extension = GetExtension(filename);
 
             switch (extension) {
               case 'jpg':
@@ -252,6 +260,67 @@ angular.module('app')
         });
       }
 
+      function CopyImages(object) {
+        var root = ProjectsManagerSvc.GetRoot();
+        object.traverse(function(child) {
+
+          if (child.material && child.material.map instanceof AMTHREE.ImageTexture) {
+            var image_ref = child.material.map.image_ref;
+            var url = image_ref.url;
+            if (url) {
+              url = url.replace('file:///', '');
+              if (FileSystemSvc.FileExists(url)) {
+                var new_path = root + '/' + AMTHREE.IMAGE_PATH + GetFilename(url);
+                if (!FileSystemSvc.FileExists(new_path)) {
+                  FileSystemSvc.CopyFile(url, new_path);
+                  image_ref.url = new_path;
+                  child.material.map.set(image_ref);
+                }
+              }
+            }
+          }
+
+        });
+      }
+
+      function CopyModel(url) {
+        if (url) {
+
+        var root = ProjectsManagerSvc.GetRoot();
+        url = url.replace('file:///', '');
+          if (FileSystemSvc.FileExists(url)) {
+            var new_path = root + '/' + AMTHREE.MODEL_PATH + GetFilename(url);
+            if (!FileSystemSvc.FileExists(new_path)) {
+              FileSystemSvc.CopyFile(url, new_path);
+            }
+          }
+
+        }
+      }
+
+      function ColladaImporter(path) {
+        path = ReplaceBackslashBySlash(path);
+        var objects = DataManagerSvc.GetData().objects;
+        var root = ProjectsManagerSvc.GetRoot();
+
+        var object = new AMTHREE.ColladaObject();
+        object.load(path).then(function(object) {
+          var mesh = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.7, 0.7),
+            new THREE.MeshBasicMaterial( { side: THREE.DoubleSide, depthWrite: false, depthTest: false } ));
+          mesh.material.opacity = 0;
+          mesh.material.transparent = true;
+          mesh.add(AMTHREE.NormalizeObject(object));
+          object = mesh;
+          object.name = GetFilename(path);
+          CopyImages(object);
+          CopyModel(path);
+          objects[object.uuid] = object;
+          DataManagerSvc.NotifyChange('object', object.uuid);
+        }).catch(function(e) {
+          console.warn(e);
+        });
+      }
+
       return function() {
         var files = _dialog.showOpenDialog( {
           title: 'Import models 3D',
@@ -259,14 +328,26 @@ angular.module('app')
           filters: [
             {
               name: 'Threejs object',
-              extensions: ['json']
+              extensions: ['json', 'dae']
             }
           ]
         });
 
         if (typeof files !== 'undefined') {
           for (var i = 0, c = files.length; i < c; ++i) {
-            (new ObjectImporter(files[i]));
+            var path = files[i];
+
+            var extension = GetExtension(path);
+
+            switch (extension) {
+              case 'json':
+              (new ObjectImporter(path));
+              break;
+
+              case 'dae':
+              (new ColladaImporter(path));
+              break;
+            }
           }
         }
       }
