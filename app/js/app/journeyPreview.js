@@ -7,13 +7,15 @@ angular.module('app')
   'JourneyManagerSvc',
   'DataManagerSvc',
   'JourneyRenderer',
+  '$timeout',
   function(
     JourneySceneSvc,
     GeolocationSvc,
     CameraSvc,
     JourneyManagerSvc,
     DataManagerSvc,
-    JourneyRenderer) {
+    JourneyRenderer,
+    $timeout) {
 
 
   return {
@@ -25,6 +27,7 @@ angular.module('app')
     link: function(scope, element, attr) {
 
       var _journey_renderer = new JourneyRenderer();
+      _journey_renderer.SetDebug(true);
 
       var _element = element[0];
       var _canvas = _element.children[0];
@@ -66,27 +69,15 @@ angular.module('app')
       }
 
       function Draw() {
-        if (_camera_video_element.readyState === _camera_video_element.HAVE_ENOUGH_DATA) {
-          if (_camera_width > 0 && _camera_height > 0) {
-            var ratio_x = _canvas.width  / _camera_width;
-            var ratio_y = _canvas.height / _camera_height;
-            var ratio   = Math.max(ratio_x, ratio_y);
-            var diff_h  = (_canvas.width  - _camera_width  * ratio) / 2;
-            var diff_v  = (_canvas.height - _camera_height * ratio) / 2;
-            var new_width  = _camera_width  * ratio;
-            var new_height = _camera_height * ratio;
-
-            // _ctx.drawImage(_camera_video_element, diff_h, diff_v, new_width, new_height);
-          }
-        }
-
         _journey_renderer.Render();
         _ctx.drawImage(_scene_canvas, 0, 0);
       }
 
       function OnDataChange() {
         Stop();
-        Run();
+        $timeout(function() {
+          Run();
+        });
       }
 
       function OnMouseWheel(e) {
