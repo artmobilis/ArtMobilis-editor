@@ -305,12 +305,6 @@ angular.module('app')
 
         var object = new AMTHREE.ColladaObject();
         object.load(path).then(function(object) {
-          var mesh = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.7, 0.7),
-            new THREE.MeshBasicMaterial( { side: THREE.DoubleSide, depthWrite: false, depthTest: false } ));
-          mesh.material.opacity = 0;
-          mesh.material.transparent = true;
-          mesh.add(AMTHREE.NormalizeObject(object));
-          object = mesh;
           object.name = GetFilename(path);
           CopyImages(object);
           CopyModel(path);
