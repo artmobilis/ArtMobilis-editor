@@ -136,7 +136,7 @@ angular.module('app')
         _selection_box.visible = false;
         _transform_controls.detach();
 
-        if (object !== null) {
+        if (object) {
           scope.index = _selection.userData.index;
           if (object.geometry !== undefined &&
              object instanceof THREE.Sprite === false) {
@@ -155,10 +155,20 @@ angular.module('app')
       var raycaster = new THREE.Raycaster();
       var mouse = new THREE.Vector2();
 
-      function GetIntersects(point, objects) {
+      function GetIntersect(point, object) {
         mouse.set((point.x * 2) - 1, -(point.y * 2) + 1);
         raycaster.setFromCamera(mouse, _camera);
-        return raycaster.intersectObjects(objects);
+        var intersects = raycaster.intersectObjects(object.children, true);
+        if (intersects.length > 0) {
+          var inter = intersects[0];
+          var output = inter.object;
+
+          while(output.parent && output.parent !== object) {
+            output = output.parent;
+          }
+
+          return output;
+        }
       }
 
       var _on_down_position = new THREE.Vector2();
@@ -180,21 +190,11 @@ angular.module('app')
 
       function HandleClick() {
         if (_on_down_position.distanceTo(_on_up_position) === 0) {
-          var intersects = GetIntersects(_on_up_position, _contents_meshes.children);
-          if (intersects.length > 0) {
-            var object = intersects[0].object;
-            if (object.userData.object !== undefined) {
-
-              // helper
-              Select(object.userData.object);
-            }
-            else {
-              Select(object);
-            }
-          }
-          else {
-            Select(null);
-          }
+          var object = GetIntersect(_on_up_position, _contents_meshes);
+          if (object && object.userData.object !== undefined)
+            Select(object.userData.object); // helper
+          else
+            Select(object);
 
           Render();
         }
@@ -241,12 +241,10 @@ angular.module('app')
         var array = GetMousePosition(_element, event.clientX, event.clientY);
         _on_double_click_position.fromArray(array);
 
-        var intersects = GetIntersects(_on_double_click_position, _contents_meshes.children);
+        var object = GetIntersect(_on_double_click_position, _contents_meshes);
 
-        if (intersects.length > 0) {
-          var intersect = intersects[0];
-
-          OnObjectFocused(intersect.object);
+        if (object) {
+          OnObjectFocused(object);
         }
       }
 
