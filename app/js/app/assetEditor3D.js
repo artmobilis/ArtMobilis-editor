@@ -7,7 +7,7 @@ angular.module('app')
       asset_id: '@assetId',
       enabled: '@'
     },
-    templateUrl: "templates/channel_editor.html",
+    templateUrl: "templates/asset_editor_3D.html",
     link: function(scope, element, attr) {
       scope.mode = 'translate';
       scope.index = null;
