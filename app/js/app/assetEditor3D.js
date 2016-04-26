@@ -280,7 +280,11 @@ angular.module('app')
         }
       }
 
-      function OnChannelChange() {
+      function OnAssetChange() {
+        ClearScene();
+      }
+
+      function ClearScene() {
         AMTHREE.StopAnimatedTextures(_scene);
         AMTHREE.StopSounds(_scene);
         if (_transform_controls)
@@ -321,9 +325,9 @@ angular.module('app')
       }
 
       function OnWindowResize() {
-          _renderer.setSize(_element.clientWidth, _element.clientHeight);
-          _camera.aspect = _renderer.domElement.width / _renderer.domElement.height;
-          _camera.updateProjectionMatrix();
+        _renderer.setSize(_element.clientWidth, _element.clientHeight);
+        _camera.aspect = _renderer.domElement.width / _renderer.domElement.height;
+        _camera.updateProjectionMatrix();
       }
 
       function CheckCanvasSize() {
@@ -392,17 +396,16 @@ angular.module('app')
 
 
 
-      scope.$watch('asset_id', function(attr_channel_id) {
-        OnChannelChange();
+      scope.$watch('asset_id', function(attr_asset_id) {
+        OnAssetChange();
 
-        _channel = DataManagerSvc.GetData().channels[attr_channel_id];
+        _channel = DataManagerSvc.GetData().channels[attr_asset_id];
         if (!_channel)
           return;
 
         DataManagerSvc.GetLoadPromise().then(function() {
           SetChannel();
         });
-
       });
 
       scope.$watch('mode', function(mode) {
