@@ -1,6 +1,6 @@
 angular.module('app')
 
-.directive('channelEditor', ['DataManagerSvc', function(DataManagerSvc) {
+.directive('assetEditor3d', ['DataManagerSvc', function(DataManagerSvc) {
   return {
     restrict: 'AE',
     scope: {
