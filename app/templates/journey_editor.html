@@ -82,7 +82,7 @@
     ng-show="selection.type !== 'journey'">
       <channel-editor id="transform_channel"
       channel-id="{{selection.type === 'channels' ? selection.id : null}}"
-      active="{{selection.type !== 'journey' && state.active}}">
+      active="{{(selection.type === 'channels' || selection.type === 'contents')&& state.active}}">
       </channel-editor>
     </div>
 
