@@ -55,12 +55,8 @@ angular.module('app')
       _selection_box.visible = false;
       _scene_helpers.add(_selection_box);
 
-      var _transform_controls = new THREE.TransformControls(_camera, _element);
-
-      // _controls need to be added *after* main logic,
-      // otherwise _controls.enabled doesn't work.
-
-      var _controls = new THREE.EditorControls(_camera, _element);
+      var _transform_controls;
+      var _controls;
 
 
       var AddHelper = function() {
@@ -287,7 +283,8 @@ angular.module('app')
       function OnChannelChange() {
         AMTHREE.StopAnimatedTextures(_scene);
         AMTHREE.StopSounds(_scene);
-        _transform_controls.detach();
+        if (_transform_controls)
+          _transform_controls.detach();
         _marker_mesh.visible = false;
         _contents_meshes.remove.apply(_contents_meshes, _contents_meshes.children);
         _selection_box.visible = false;
@@ -393,8 +390,6 @@ angular.module('app')
 
       _scene.add(_grid);
 
-      _scene_helpers.add(_transform_controls);
-
 
 
       scope.$watch('channel_id', function(attr_channel_id) {
@@ -426,6 +421,8 @@ angular.module('app')
 
       function Stop() {
         if (_running) {
+          _scene_helpers.remove(_transform_controls);
+
           window.removeEventListener('resize', OnWindowResize, false);
 
           _canvas.removeEventListener('mousedown', OnMouseDown, false);
@@ -437,6 +434,13 @@ angular.module('app')
           _transform_controls.removeEventListener('mouseUp', OnTransformControlsMouseUp);
 
           _controls.removeEventListener('change', OnControlsChange, false);
+
+          _controls.dispose();
+          _transform_controls.dispose();
+          _controls = undefined;
+          _transform_controls = undefined;
+
+          _renderer.clear();
 
           _running = false;
         }
@@ -453,11 +457,16 @@ angular.module('app')
           _canvas.addEventListener('touchstart', OnTouchStart, false);
           _canvas.addEventListener('dblclick', OnDoubleClick, false);
 
+          _transform_controls = new AMTHREE.TransformControls(_camera, _element);
+          _controls = new THREE.EditorControls(_camera, _element);
+
           _transform_controls.addEventListener('change', OnTransformChange, false);
           _transform_controls.addEventListener('mouseDown', OnTransformControlsMouseDown);
           _transform_controls.addEventListener('mouseUp', OnTransformControlsMouseUp);
 
           _controls.addEventListener('change', OnControlsChange, false);
+
+          _scene_helpers.add(_transform_controls);
 
           function Loop() {
             if (_running) {
