@@ -81,8 +81,9 @@
     <div id="editor-3D" droppable drop="Drop"
     ng-show="selection.type !== 'journey'">
       <asset-editor3d id="transform_channel"
-      asset-id="{{selection.type === 'channels' ? selection.id : null}}"
-      enabled="{{(selection.type === 'channels' || selection.type === 'contents')&& state.active}}">
+      asset-type="{{selection.type}}"
+      asset-id="{{selection.id}}"
+      enabled="{{(selection.type !== 'pois' && selection.type !== 'journey') && state.active}}">
       </asset-editor3d>
     </div>
 

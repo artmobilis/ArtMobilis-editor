@@ -4,16 +4,19 @@ angular.module('app')
   return {
     restrict: 'AE',
     scope: {
+      asset_type: '@assetType',
       asset_id: '@assetId',
       enabled: '@'
     },
-    templateUrl: "templates/asset_editor_3D.html",
+    templateUrl: 'templates/asset_editor_3D.html',
     link: function(scope, element, attr) {
       scope.mode = 'translate';
-      scope.index = null;
       scope.GetSelectionName = function() {
-        if (scope.channel_id && typeof scope.index === 'number')
-          return DataManagerSvc.GetData().channels[scope.channel_id].contents[scope.index].name;
+        if (scope.asset_id && _selection.index >= 0) {
+          var channel = DataManagerSvc.GetData().channels[scope.asset_id];
+          if (channel)
+            return channel.contents[_selection.index].name;
+        }
         return null;
       }
 
@@ -35,7 +38,6 @@ angular.module('app')
 
       var _scene_helpers = new THREE.Scene();
 
-      var _selection = null;
       var _helpers = {};
 
       var _running = false;
@@ -44,20 +46,39 @@ angular.module('app')
       var _grid = new THREE.GridHelper( 50, 1 );
       _grid.scale.x = _grid.scale.y = _grid.scale.z = 0.25;
 
-      var _channel;
+      var _asset = {
+        type: '',
+        id: '',
+        channel: null,
+        content: null,
+        object: null,
+        marker: null,
+        marker_object: CreateMarkerObject(),
+        contents_object: new THREE.Object3D(),
+        container_object: new THREE.Object3D()
+      };
 
-      var _marker_mesh, _contents_meshes = new THREE.Object3D();
-      CreateMarkerObject();
-
-      var _selection_box = new THREE.BoxHelper();
-      _selection_box.material.depthTest = false;
-      _selection_box.material.transparent = true;
-      _selection_box.visible = false;
-      _scene_helpers.add(_selection_box);
+      var _selection = {
+        object: null,
+        box: new THREE.BoxHelper(),
+        index: -1
+      };
+      _selection.box.material.depthTest = false;
+      _selection.box.material.transparent = true;
+      _selection.box.visible = false;
+      _scene_helpers.add(_selection.box);
 
       var _transform_controls;
       var _controls;
 
+
+      function CreateMarkerObject() {
+        var material = new THREE.MeshBasicMaterial( { side: THREE.DoubleSide } );
+        var geometry = new THREE.PlaneGeometry(1, 1);
+        var mesh = new THREE.Mesh(geometry, material);
+        mesh.position.z = -0.001;
+        return mesh;
+      }
 
       var AddHelper = function() {
 
@@ -69,7 +90,7 @@ angular.module('app')
           var helper;
 
           if (object instanceof THREE.Camera) {
-            helper = new THREE.CameraHelper( object, 1 );
+            helper = new THREE.CameraHelper(object, 1);
           } else if (object instanceof THREE.PointLight) {
             helper = new THREE.PointLightHelper(object, 1);
           } else if (object instanceof THREE.DirectionalLight) {
@@ -123,27 +144,31 @@ angular.module('app')
           object = object.parent;
         }
 
-        if ( _selection === object ) return;
+        if ( _selection.object === object ) return;
 
-        _selection = object;
-
-        scope.index = null;
-
-        _selection_box.visible = false;
-        _transform_controls.detach();
+        ResetSelection();
 
         if (object) {
-          scope.index = _selection.userData.index;
+          _selection.object = object;
+          _selection.index = _selection.object.userData.index;
           if (object.geometry !== undefined &&
              object instanceof THREE.Sprite === false) {
 
-            _selection_box.update(object);
-            _selection_box.visible = true;
+            _selection.box.update(object);
+            _selection.box.visible = true;
           }
 
           _transform_controls.attach(object);
         }
         scope.$apply();
+      }
+
+      function ResetSelection() {
+        if (_transform_controls)
+          _transform_controls.detach();
+        _selection.object = null;
+        _selection.box.visible = false;
+        _selection.index = -1;
       }
 
       // object picking
@@ -186,7 +211,7 @@ angular.module('app')
 
       function HandleClick() {
         if (_on_down_position.distanceTo(_on_up_position) === 0) {
-          var object = GetIntersect(_on_up_position, _contents_meshes);
+          var object = GetIntersect(_on_up_position, _asset.contents_object);
           if (object && object.userData.object !== undefined)
             Select(object.userData.object); // helper
           else
@@ -237,7 +262,7 @@ angular.module('app')
         var array = GetMousePosition(_element, event.clientX, event.clientY);
         _on_double_click_position.fromArray(array);
 
-        var object = GetIntersect(_on_double_click_position, _contents_meshes);
+        var object = GetIntersect(_on_double_click_position, _asset.contents_object);
 
         if (object) {
           OnObjectFocused(object);
@@ -261,8 +286,8 @@ angular.module('app')
       function SaveChanges(object) {
         if (object && typeof object.userData.index === 'number') {
           var index = object.userData.index;
-          if (_channel) {
-            var content = _channel.contents[index];
+          if (_asset.channel) {
+            var content = _asset.channel.contents[index];
             Point3DCopy(object.position, content.position);
             Point3DCopy(object.rotation, content.rotation);
             Point3DCopy(object.scale, content.scale);
@@ -274,7 +299,7 @@ angular.module('app')
         var object = _transform_controls.object;
         if (object !== undefined) {
 
-          _selection_box.update(object);
+          _selection.box.update(object);
 
           SaveChanges(object);
         }
@@ -282,31 +307,82 @@ angular.module('app')
 
       function OnAssetChange() {
         ClearScene();
+
+        switch(_asset.type) {
+          case 'channels':
+            DataManagerSvc.GetLoadPromise().then(function() {
+              _asset.channel = DataManagerSvc.GetData().channels[_asset.id];
+              if (!_asset.channel)
+                return;
+
+              SetChannel();
+            });
+          break;
+
+          case 'contents':
+            DataManagerSvc.GetLoadPromise().then(function() {
+              _asset.content = DataManagerSvc.GetData().contents[_asset.id];
+              if (_asset.content) {
+                var object = DataManagerSvc.GetData().objects[_asset.content.object];
+                if (object) {
+                  _asset.container_object.add(object.clone());
+                  AMTHREE.PlayAnimatedTextures(_scene);
+                  AMTHREE.PlaySounds(_scene);
+                }
+              }
+            });
+          break;
+
+          case 'objects':
+            DataManagerSvc.GetLoadPromise().then(function() {
+              _asset.object = DataManagerSvc.GetData().objects[_asset.id];
+              if (_asset.object) {
+                _asset.container_object.add(_asset.object.clone());
+                AMTHREE.PlayAnimatedTextures(_scene);
+                AMTHREE.PlaySounds(_scene);
+              }
+            });
+          break;
+
+          case 'markers':
+            DataManagerSvc.GetLoadPromise().then(function() {
+              _asset.marker = DataManagerSvc.GetData().markers[_asset.id];
+              if (_asset.marker) {
+                SetMarker(_asset.marker);
+              }
+            });
+          break;
+        }
       }
 
       function ClearScene() {
         AMTHREE.StopAnimatedTextures(_scene);
         AMTHREE.StopSounds(_scene);
-        if (_transform_controls)
-          _transform_controls.detach();
-        _marker_mesh.visible = false;
-        _contents_meshes.remove.apply(_contents_meshes, _contents_meshes.children);
-        _selection_box.visible = false;
-        _channel = null;
-        scope.selection = null;
+        ResetSelection();
+        _asset.marker_object.visible = false;
+        _asset.contents_object.remove.apply(_asset.contents_object, _asset.contents_object.children);
+        _asset.container_object.remove.apply(_asset.container_object, _asset.container_object.children);
+        _asset.channel = null;
+        _asset.content = null;
+        _asset.object  = null;
+        _asset.marker  = null;
+      }
+
+      function SetMarker(marker) {
+        if (marker) {
+          (new THREE.TextureLoader()).load(marker.url, function(texture) {
+            _asset.marker_object.material.map = texture;
+            _asset.marker_object.material.needsUpdate = true;
+            _asset.marker_object.visible = true;
+          });
+        }
       }
 
       function SetChannel() {
         LoadContents();
 
-        var marker = DataManagerSvc.GetData().markers[_channel.marker];
-        if (marker) {
-          (new THREE.TextureLoader()).load(marker.url, function(texture) {
-            _marker_mesh.material.map = texture;
-            _marker_mesh.material.needsUpdate = true;
-            _marker_mesh.visible = true;
-          });
-        }
+        var marker = DataManagerSvc.GetData().markers[_asset.channel.marker];
+        SetMarker(marker);
         AMTHREE.PlayAnimatedTextures(_scene);
         AMTHREE.PlaySounds(_scene);
       }
@@ -343,20 +419,13 @@ angular.module('app')
         box.getBoundingSphere(sphere);
       }
 
-      function CreateMarkerObject() {
-        var material = new THREE.MeshBasicMaterial( { side: THREE.DoubleSide } );
-        var geometry = new THREE.PlaneGeometry(1, 1);
-        _marker_mesh = new THREE.Mesh(geometry, material);
-        _marker_mesh.position.z = -0.001;
-      }
-
       function LoadContents() {
-        _contents_meshes.remove.apply(_contents_meshes, _contents_meshes.children);
+        _asset.contents_object.remove.apply(_asset.contents_object, _asset.contents_object.children);
 
         var sphere = new THREE.Sphere();
 
-        for(var len = _channel.contents.length, index = 0; index < len; ++index) {
-          var contents_transform = _channel.contents[index];
+        for(var len = _asset.channel.contents.length, index = 0; index < len; ++index) {
+          var contents_transform = _asset.channel.contents[index];
           var contents_uuid = contents_transform.uuid;
           var contents = DataManagerSvc.GetData().contents[contents_uuid];
           if (!contents)
@@ -381,7 +450,7 @@ angular.module('app')
 
           GetBoundingSphere(object, sphere);
 
-          _contents_meshes.add(object);
+          _asset.contents_object.add(object);
         }
       }
 
@@ -389,23 +458,17 @@ angular.module('app')
       _scene.add(new THREE.HemisphereLight(0xffffbb, 0x080820, 1));
       _scene.add(new THREE.AmbientLight(0x404040));
 
-      _scene.add(_contents_meshes);
-      _scene.add(_marker_mesh);
+      _scene.add(_asset.contents_object);
+      _scene.add(_asset.marker_object);
+      _scene.add(_asset.container_object);
 
       _scene.add(_grid);
 
 
-
-      scope.$watch('asset_id', function(attr_asset_id) {
+      scope.$watchGroup(['asset_type', 'asset_id'], function(new_values) {
+        _asset.type = new_values[0];
+        _asset.id   = new_values[1];
         OnAssetChange();
-
-        _channel = DataManagerSvc.GetData().channels[attr_asset_id];
-        if (!_channel)
-          return;
-
-        DataManagerSvc.GetLoadPromise().then(function() {
-          SetChannel();
-        });
       });
 
       scope.$watch('mode', function(mode) {
@@ -481,7 +544,7 @@ angular.module('app')
           };
           Loop();
         }
-      };
+      }
 
       Run();
 
