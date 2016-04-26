@@ -8,7 +8,7 @@ angular.module('app')
       asset_id: '@assetId',
       enabled: '@'
     },
-    templateUrl: 'templates/asset_editor_3D.html',
+    templateUrl: 'templates/asset_editor_3d.html',
     link: function(scope, element, attr) {
       scope.mode = 'translate';
       scope.GetSelectionName = function() {
