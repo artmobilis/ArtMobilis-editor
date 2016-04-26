@@ -81,8 +81,8 @@
     <div id="editor-3D" droppable drop="Drop"
     ng-show="selection.type !== 'journey'">
       <channel-editor id="transform_channel"
-      channel-id="{{selection.type === 'channels' ? selection.id : null}}"
-      active="{{(selection.type === 'channels' || selection.type === 'contents')&& state.active}}">
+      asset-id="{{selection.type === 'channels' ? selection.id : null}}"
+      enabled="{{(selection.type === 'channels' || selection.type === 'contents')&& state.active}}">
       </channel-editor>
     </div>
 

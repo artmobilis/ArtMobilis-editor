@@ -4,8 +4,8 @@ angular.module('app')
   return {
     restrict: 'AE',
     scope: {
-      channel_id: '@channelId',
-      active: '@'
+      asset_id: '@assetId',
+      enabled: '@'
     },
     templateUrl: "templates/channel_editor.html",
     link: function(scope, element, attr) {
@@ -392,7 +392,7 @@ angular.module('app')
 
 
 
-      scope.$watch('channel_id', function(attr_channel_id) {
+      scope.$watch('asset_id', function(attr_channel_id) {
         OnChannelChange();
 
         _channel = DataManagerSvc.GetData().channels[attr_channel_id];
@@ -409,11 +409,11 @@ angular.module('app')
         _transform_controls.setMode(mode);
       });
 
-      scope.$watch('active', function(active) {
-        if (active === 'true') {
+      scope.$watch('enabled', function(enabled) {
+        if (enabled === 'true') {
           Run();
         }
-        else if (active === 'false') {
+        else if (enabled === 'false') {
           Stop();
         }
       });
