@@ -6,13 +6,18 @@ angular.module('app')
   'ImportSvc',
   'ExportSvc',
   'ProjectsManagerSvc',
+  '$timeout',
   function(DataManagerSvc,
     dataJourneyFactory,
     ImportSvc,
     ExportSvc,
-    ProjectsManagerSvc) {
+    ProjectsManagerSvc,
+    $timeout) {
   return {
     restrict: 'E',
+    scope: {
+      debug: '='
+    },
     link: function($scope, $element, $attr) {
 
       var template = [
@@ -133,6 +138,10 @@ angular.module('app')
                   focusedWindow.toggleDevTools();
               }
             },
+            {
+              label: 'Toggle Debug Mode',
+              click: ToggleDebugMode
+            }
           ]
         },
         {
@@ -207,6 +216,11 @@ angular.module('app')
         file_menu_items[3].enabled = active;
         file_menu_items[4].enabled = active;
         file_menu_items[5].enabled = active;
+      }
+
+      function ToggleDebugMode() {
+        $scope.debug = !$scope.debug;
+        $timeout();
       }
 
       ProjectsManagerSvc.AddListenerChange(OnProjectChange);

@@ -7,6 +7,7 @@ angular.module('app')
   'JourneyManagerSvc',
   'DataManagerSvc',
   'JourneyRenderer',
+  'MarkerDetectorSvc',
   '$timeout',
   function(
     JourneySceneSvc,
@@ -15,13 +16,15 @@ angular.module('app')
     JourneyManagerSvc,
     DataManagerSvc,
     JourneyRenderer,
+    MarkerDetectorSvc,
     $timeout) {
 
 
   return {
     restrict: 'E',
     scope: {
-      active: '@'
+      active: '@',
+      debug: '='
     },
     template: '<canvas style="position: absolute"></canvas>',
     link: function(scope, element, attr) {
@@ -177,6 +180,13 @@ angular.module('app')
         }
         else if (active === 'false') {
           Stop();
+        }
+      });
+
+      scope.$watch('debug', function(debug) {
+        if (typeof debug === 'boolean') {
+          MarkerDetectorSvc.SetDebug(debug);
+          _journey_renderer.SetDebug(debug);
         }
       });
 

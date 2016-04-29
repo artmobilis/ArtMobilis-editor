@@ -1,7 +1,8 @@
 <div id="editor">
 
   <div id="header">
-    <journey-editor-toolbar></journey-editor-toolbar>
+    <journey-editor-toolbar debug="debug.state">
+    </journey-editor-toolbar>
   </div>
 
   <div id="content">
@@ -89,7 +90,8 @@
 
     <journey-preview id="journey-preview"
     ng-show="selection.type === 'journey'"
-    active="{{selection.type === 'journey' && state.active}}">
+    active="{{selection.type === 'journey' && state.active}}"
+    debug="debug.state">
     </journey-preview>
 
 

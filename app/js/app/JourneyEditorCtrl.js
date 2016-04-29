@@ -35,6 +35,10 @@ angular.module('app')
     active: false
   }
 
+  $scope.debug = {
+    state: false
+  }
+
   function OnChannelUpdated() {
     $timeout(function() {
       var type = _selection.type;
