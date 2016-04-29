@@ -541,6 +541,8 @@ angular.module('app')
 
           _scene_helpers.add(_transform_controls);
 
+          _transform_controls.setMode(scope.mode);
+
           function Loop() {
             if (_running) {
               window.requestAnimationFrame(Loop);
