@@ -6,12 +6,14 @@ angular.module('app')
   'ImportSvc',
   'ExportSvc',
   'ProjectsManagerSvc',
+  'CameraSvc',
   '$timeout',
   function(DataManagerSvc,
     dataJourneyFactory,
     ImportSvc,
     ExportSvc,
     ProjectsManagerSvc,
+    CameraSvc,
     $timeout) {
   return {
     restrict: 'E',
@@ -140,7 +142,13 @@ angular.module('app')
             },
             {
               label: 'Toggle Debug Mode',
-              click: ToggleDebugMode
+              click: ToggleDebugMode,
+              accelerator: 'CmdOrCtrl+D'
+            },
+            {
+              label: 'Pause/unpause video stream',
+              click: TogglePauseVideo,
+              accelerator: 'CmdOrCtrl+F'
             }
           ]
         },
@@ -221,6 +229,10 @@ angular.module('app')
       function ToggleDebugMode() {
         $scope.debug = !$scope.debug;
         $timeout();
+      }
+
+      function TogglePauseVideo() {
+        CameraSvc.TogglePause();
       }
 
       ProjectsManagerSvc.AddListenerChange(OnProjectChange);
