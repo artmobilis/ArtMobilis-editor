@@ -371,6 +371,13 @@ angular.module('app')
       function SetMarker(marker) {
         if (marker) {
           (new THREE.TextureLoader()).load(marker.url, function(texture) {
+            _asset.marker_object.scale.set(1, 1, 1);
+            var image = texture.image;
+            var ratio = image.naturalWidth / image.naturalHeight;
+            if (ratio < 1)
+              _asset.marker_object.scale.x = ratio;
+            else
+              _asset.marker_object.scale.y = 1 / ratio;
             _asset.marker_object.material.map = texture;
             _asset.marker_object.material.needsUpdate = true;
             _asset.marker_object.visible = true;
