@@ -144,11 +144,25 @@ angular.module('app')
               label: 'Toggle Debug Mode',
               click: ToggleDebugMode,
               accelerator: 'CmdOrCtrl+D'
-            },
+            }
+          ]
+        },
+        {
+          label: 'Camera',
+          submenu: [
             {
-              label: 'Pause/unpause video stream',
+              label: 'Pause/unpause',
               click: TogglePauseVideo,
               accelerator: 'CmdOrCtrl+F'
+            },
+            {
+              label: 'Play video...',
+              click: PlayVideo
+            },
+            {
+              label: 'Play camera',
+              click: PlayCamera,
+              enabled: false
             }
           ]
         },
@@ -183,10 +197,12 @@ angular.module('app')
       var _remote = require('remote');
       var _dialog = _remote.require('electron').dialog;
       var Menu = _remote.Menu;
+      var MenuItem = _remote.MenuItem;
 
       var _menu = new Menu();
       _menu = Menu.buildFromTemplate(template);
       Menu.setApplicationMenu(_menu);
+
 
       function Open() {
         ImportSvc.Open();
@@ -233,6 +249,34 @@ angular.module('app')
 
       function TogglePauseVideo() {
         CameraSvc.TogglePause();
+      }
+
+      function PlayVideo() {
+        var files = _dialog.showOpenDialog({
+          title: 'Open video',
+          properties: ['openFile'],
+          filters: [
+            {
+              name: 'Video',
+              extensions: ['mp4', 'webm']
+            }
+          ]
+        });
+
+        if (files && files.length === 1) {
+          var file = files[0];
+
+          CameraSvc.SetVideo(file);
+
+          var file_menu_items = _menu.items[3].submenu.items;
+          file_menu_items[2].enabled = true;
+        }
+      }
+
+      function PlayCamera() {
+        var file_menu_items = _menu.items[3].submenu.items;
+        file_menu_items[2].enabled = false;
+        CameraSvc.Reset();
       }
 
       ProjectsManagerSvc.AddListenerChange(OnProjectChange);
