@@ -360,6 +360,7 @@ angular.module('app')
 
         var config_file = root + '/journey.json';
         FileSystemSvc.ReadFile(config_file).then(OnLoadFile).catch(function(err) {
+          ProjectsManagerSvc.Close();
           console.warn('failed to open project: ', err);
         });
       }
