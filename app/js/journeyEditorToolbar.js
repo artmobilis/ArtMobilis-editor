@@ -7,6 +7,7 @@ angular.module('app')
   'ExportSvc',
   'ProjectsManagerSvc',
   'CameraSvc',
+  'JourneySceneSvc',
   '$timeout',
   function(DataManagerSvc,
     dataJourneyFactory,
@@ -14,6 +15,7 @@ angular.module('app')
     ExportSvc,
     ProjectsManagerSvc,
     CameraSvc,
+    JourneySceneSvc,
     $timeout) {
   return {
     restrict: 'E',
@@ -142,6 +144,7 @@ angular.module('app')
             },
             {
               label: 'Toggle Debug Mode',
+              type: 'checkbox',
               click: ToggleDebugMode,
               accelerator: 'CmdOrCtrl+D'
             }
@@ -151,7 +154,8 @@ angular.module('app')
           label: 'Camera',
           submenu: [
             {
-              label: 'Pause/unpause',
+              label: 'Pause',
+              type: 'checkbox',
               click: TogglePauseVideo,
               accelerator: 'CmdOrCtrl+F'
             },
@@ -161,8 +165,21 @@ angular.module('app')
             },
             {
               label: 'Play camera',
+              type: 'checkbox',
+              checked: CameraSvc.IsPaused(),
               click: PlayCamera,
               enabled: false
+            },
+            {
+              label: 'Marker detection',
+              submenu: [
+                {
+                  label: 'Use fixed angle',
+                  type: 'checkbox',
+                  checked: false,
+                  click: ToggleDetectionUseFixedAngle
+                }
+              ]
             }
           ]
         },
@@ -203,6 +220,10 @@ angular.module('app')
       _menu = Menu.buildFromTemplate(template);
       Menu.setApplicationMenu(_menu);
 
+      var _menus = {
+        play_camera: _menu.items[3].submenu.items[2]
+      }
+
 
       function Open() {
         ImportSvc.Open();
@@ -242,13 +263,15 @@ angular.module('app')
         file_menu_items[5].enabled = active;
       }
 
-      function ToggleDebugMode() {
+      function ToggleDebugMode(menu_item) {
         $scope.debug = !$scope.debug;
+        menu_item.checked = $scope.debug;
         $timeout();
       }
 
-      function TogglePauseVideo() {
+      function TogglePauseVideo(menu_item) {
         CameraSvc.TogglePause();
+        menu_item.checked = CameraSvc.IsPaused();
       }
 
       function PlayVideo() {
@@ -268,15 +291,17 @@ angular.module('app')
 
           CameraSvc.SetVideo(file);
 
-          var file_menu_items = _menu.items[3].submenu.items;
-          file_menu_items[2].enabled = true;
+          _menus.play_camera.enabled = true;
         }
       }
 
-      function PlayCamera() {
-        var file_menu_items = _menu.items[3].submenu.items;
-        file_menu_items[2].enabled = false;
+      function PlayCamera(menu_item) {
+        menu_item.enabled = false;
         CameraSvc.Reset();
+      }
+
+      function ToggleDetectionUseFixedAngle(menu_item) {
+        JourneySceneSvc.DetectionUseFixedAngle(menu_item.checked);
       }
 
       ProjectsManagerSvc.AddListenerChange(OnProjectChange);
