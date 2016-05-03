@@ -121,7 +121,10 @@ angular.module('app')
           _camera_video_element.addEventListener('loadedmetadata', OnCamLoaded, false);
           DataManagerSvc.AddListenerDataChange(OnDataChange);
 
-          JourneySceneSvc.Start(false);
+          JourneyManagerSvc.Start();
+          CameraSvc.Start().catch(function(e) {
+          });
+          JourneySceneSvc.Start(true);
           _journey_renderer.Start();
 
           _pointer_lock.AddLockListener(OnPointerLock);
@@ -171,6 +174,9 @@ angular.module('app')
           _pointer_lock.Disconnect();
           _pointer_lock.RemoveLockListener(OnPointerLock);
           _pointer_lock.RemoveUnlockListener(OnPointerUnlock);
+
+          CameraSvc.Stop();
+          JourneyManagerSvc.Stop();
         }
       }
 
