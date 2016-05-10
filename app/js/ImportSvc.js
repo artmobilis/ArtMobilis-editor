@@ -125,38 +125,6 @@ angular.module('app')
       DataManagerSvc.NotifyChange('object', object.uuid);
     }
 
-    function ImportImageStatic() {
-      var files = _dialog.showOpenDialog( {
-        properties: ['openFile'],
-        filters: [
-          {
-            name: 'Image',
-            extensions: ['jpg', 'jpeg', 'png']
-          }
-        ]
-      });
-
-      if (typeof files !== 'undefined' && files.length === 1) {
-        AddPlaneJpg(files[0]);
-      }
-    }
-
-    function ImportImageGif() {
-      var files = _dialog.showOpenDialog( {
-        properties: ['openFile'],
-        filters: [
-          {
-            name: 'GIF image',
-            extensions: ['gif']
-          }
-        ]
-      });
-
-      if (typeof files !== 'undefined' && files.length === 1) {
-        AddPlaneGif(files[0]);
-      }
-    }
-
     function ImportFilesAsPlanes() {
       var files = _dialog.showOpenDialog( {
         title: 'Import objects',
@@ -385,8 +353,6 @@ angular.module('app')
     }
 
     this.ImportMarkers = ImportMarkers;
-    this.ImportImageStatic = ImportImageStatic;
-    this.ImportImageGif = ImportImageGif;
     this.ImportFilesAsPlanes = ImportFilesAsPlanes;
     this.ImportObjects3D = ImportObjects3D;
     this.Open = Open;
