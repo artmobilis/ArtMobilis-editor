@@ -125,13 +125,13 @@ angular.module('app')
       DataManagerSvc.NotifyChange('object', object.uuid);
     }
 
-    function ImportImageJpg() {
+    function ImportImageStatic() {
       var files = _dialog.showOpenDialog( {
         properties: ['openFile'],
         filters: [
           {
-            name: 'JPEG image',
-            extensions: ['jpg', 'jpeg']
+            name: 'Image',
+            extensions: ['jpg', 'jpeg', 'png']
           }
         ]
       });
@@ -164,7 +164,7 @@ angular.module('app')
         filters: [
           {
             name: 'Image, video, sound',
-            extensions: ['jpg', 'jpeg', 'gif', 'mp4', 'mp3']
+            extensions: ['jpg', 'jpeg', 'png', 'gif', 'mp4', 'mp3']
           }
         ]
       })
@@ -180,6 +180,7 @@ angular.module('app')
             switch (extension) {
               case 'jpg':
               case 'jpeg':
+              case 'png':
               var local_path = AMTHREE.IMAGE_PATH + filename;
               var new_path = root + '/' + local_path;
               if (FileSystemSvc.FileExists(new_path))
@@ -384,7 +385,7 @@ angular.module('app')
     }
 
     this.ImportMarkers = ImportMarkers;
-    this.ImportImageJpg = ImportImageJpg;
+    this.ImportImageStatic = ImportImageStatic;
     this.ImportImageGif = ImportImageGif;
     this.ImportFilesAsPlanes = ImportFilesAsPlanes;
     this.ImportObjects3D = ImportObjects3D;
