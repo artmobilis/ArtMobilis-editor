@@ -32,6 +32,8 @@ angular.module('app')
       var _journey_renderer = new JourneyRenderer();
       _journey_renderer.SetDebug(true);
 
+      JourneySceneSvc.SetDeviceMode(false);
+
       var _element = element[0];
       var _canvas = _element.children[0];
       var _ctx = _canvas.getContext('2d');
