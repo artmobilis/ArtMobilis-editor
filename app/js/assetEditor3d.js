@@ -305,7 +305,7 @@ angular.module('app')
         }
       }
 
-      function OnAssetChange() {
+      function OnTargetAssetChange() {
         ClearScene();
 
         switch(_asset.type) {
@@ -461,6 +461,12 @@ angular.module('app')
         }
       }
 
+      function OnDataChange(type, id) {
+        if (type === 'data_journey' || (type === _asset.type && id === _asset.id)) {
+          OnTargetAssetChange();
+        }
+      }
+
 
       _scene.add(new THREE.HemisphereLight(0xffffbb, 0x080820, 1));
       _scene.add(new THREE.AmbientLight(0x404040));
@@ -475,7 +481,7 @@ angular.module('app')
       scope.$watchGroup(['asset_type', 'asset_id'], function(new_values) {
         _asset.type = new_values[0];
         _asset.id   = new_values[1];
-        OnAssetChange();
+        OnTargetAssetChange();
       });
 
       scope.$watch('mode', function(mode) {
@@ -494,6 +500,8 @@ angular.module('app')
 
       function Stop() {
         if (_running) {
+          DataManagerSvc.RemoveListenerDataChange(OnDataChange);
+
           _scene_helpers.remove(_transform_controls);
 
           window.removeEventListener('resize', OnWindowResize, false);
@@ -542,6 +550,8 @@ angular.module('app')
           _scene_helpers.add(_transform_controls);
 
           _transform_controls.setMode(scope.mode);
+
+          DataManagerSvc.AddListenerDataChange(OnDataChange);
 
           function Loop() {
             if (_running) {
