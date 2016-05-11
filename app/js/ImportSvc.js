@@ -76,6 +76,7 @@ angular.module('app')
         });
 
         if (typeof files !== 'undefined') {
+          ProjectsManagerSvc.CreateDirectories();
           for (var i = 0, c = files.length; i < c; ++i) {
             (new MarkersImporter(files[i]));
           }
@@ -138,6 +139,7 @@ angular.module('app')
       })
 
       if (typeof files !== 'undefined') {
+        ProjectsManagerSvc.CreateDirectories();
         for (var i = 0, c = files.length; i < c; ++i) {
 
           function PlaneImporter(path) {
@@ -297,6 +299,7 @@ angular.module('app')
         });
 
         if (typeof files !== 'undefined') {
+          ProjectsManagerSvc.CreateDirectories();
           for (var i = 0, c = files.length; i < c; ++i) {
             var path = files[i];
 
