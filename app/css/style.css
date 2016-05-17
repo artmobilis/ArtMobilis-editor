@@ -185,6 +185,7 @@ progress::-webkit-progress-bar {
 input[type="text"],
 input[type="number"] {
   padding: 2px;
+  margin: 1px;
   transition: background 0.3s;
   background-color : #ffffff;
   color: #222222;
@@ -198,6 +199,13 @@ input[type="number"].focus,
 input[type="text"]:focus,
 input[type="number"]:focus {
   border-color: #444444;
+}
+
+.input-group-addon {
+  margin: 1px;
+  padding: 2px;
+  background-color: white;
+  color: black;
 }
 
 
