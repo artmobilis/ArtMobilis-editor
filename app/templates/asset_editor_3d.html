@@ -3,7 +3,7 @@
 "></canvas>
 
 
-<div style="
+<div id="object_name" style="
   position: absolute;
   height: auto;
   top: 1em;
@@ -20,7 +20,16 @@
 </div>
 
 
-<div style="
+<h3 id="need_save" style="
+  position: absolute;
+  top: 0px;
+  right: 8px;"
+  ng-show="need_save">
+  *
+</h3>
+
+
+<div id="tool_buttons" style="
   position: absolute;
   height: auto;
   bottom: 1em;
@@ -45,4 +54,30 @@
     Scale
   </label>
 
+</div>
+
+
+<div id="save" style="
+  position: absolute;
+  height: auto;
+  bottom: 1em;
+  left: 4px">
+  <label class="btn" style="padding: 2px; width: 8ch;
+  margin: 0px; background-color: #eeeeee;"
+  ng-click="Save()">
+    Save
+  </label>
+</div>
+
+
+<div id ="cancel" style="
+  position: absolute;
+  height: auto;
+  bottom: 1em;
+  right: 4px">
+  <label class="btn" style="padding: 2px; width: 8ch;
+  margin: 0px; background-color: #eeeeee;"
+  ng-click="Cancel()">
+    Cancel
+  </label>
 </div>
