@@ -95,7 +95,7 @@ angular.module('app')
       DataManagerSvc.NotifyChange('object', object.uuid);
     }
 
-    function AddPlaneJpg(path) {
+    function AddPlaneImage(path) {
       var image = new AMTHREE.Image(undefined, path);
       var texture = new AMTHREE.ImageTexture(image);
 
@@ -154,10 +154,10 @@ angular.module('app')
               var local_path = AMTHREE.IMAGE_PATH + filename;
               var new_path = root + '/' + local_path;
               if (FileSystemSvc.FileExists(new_path))
-                AddPlaneJpg(new_path);
+                AddPlaneImage(new_path);
               else {
                 FileSystemSvc.CopyFile(path, new_path).then(function() {
-                  AddPlaneJpg(new_path);
+                  AddPlaneImage(new_path);
                 }).catch(function(err) {
                   console.warn(err);
                 });
