@@ -127,7 +127,7 @@
 
         <div class="field-name">Channels</div>
         <ul class="grp-border">
-          <li ng-repeat="(key, poi_channel) in selection.elem.channels"
+          <li ng-repeat="(key, poi_channel) in selection.elem.channels track by $index"
             droppable drop="{{'DropToPoiChannel(\'' + selection.id + '\', \'' + key + '\');'}}">
             <div draggable drag="{{'DragAsset(\'poi-channel\', \'' + key + '\')'}}">
               <span ng-include="'templates/drag_icon.html'"></span>
