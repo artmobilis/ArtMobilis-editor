@@ -84,7 +84,7 @@
       <asset-editor3d id="transform_channel"
       asset-type="{{selection.type}}"
       asset-id="{{selection.id}}"
-      enabled="{{(selection.type !== 'pois' && selection.type !== 'journey') && state.active}}">
+      enabled="{{(selection.type !== 'journey') && state.active}}">
       </asset-editor3d>
     </div>
 
@@ -117,43 +117,35 @@
         <h3>Edit POI</h3>
         <div ng-include="'templates/trash_area.html'" droppable drop="Detach"></div>
         <div class="field-name">Name</div>
-        <input type="text" ng-model="selection.elem.name">
+        <input type="text" ng-model="selection.elem.name" ng-change="UpdatePoiPositions()">
         <div class="field-name">Latitude</div>
-        <input type="number" ng-model="selection.elem.latitude" class="edit-field">
+        <input type="number" ng-model="selection.elem.latitude" class="edit-field" ng-change="UpdatePoiPositions()">
         <div class="field-name">Longitude</div>
-        <input type="number" ng-model="selection.elem.longitude" class="edit-field">
+        <input type="number" ng-model="selection.elem.longitude" class="edit-field" ng-change="UpdatePoiPositions()">
         <div class="field-name">Radius (m)</div>
-        <input type="number" ng-model="selection.elem.radius" class="edit-field">
-        <div class="field-name">Channels</div>
+        <input type="number" ng-model="selection.elem.radius" class="edit-field" ng-change="UpdatePoiPositions()">
 
-        <uib-accordion close-others="false">
-          <uib-accordion-group ng-repeat="(key, poi_channel) in selection.elem.channels"
-          droppable drop="{{'DropToPoiChannel(\'' + selection.id + '\', \'' + key + '\');'}}">
-            <uib-accordion-heading heading>
-              <div draggable drag="{{'DragAsset(\'poi-channel\', \'' + key + '\')'}}">
-                <span ng-include="'templates/drag_icon.html'"></span>
-                {{channels[poi_channel.uuid].name}}
-              </div>
-            </uib-accordion-heading>
-            <div draggable drag="{{'DragAsset(\'poi-channel-object\', \'' + key + '\')'}}">
+        <div class="field-name">Channels</div>
+        <ul class="grp-border">
+          <li ng-repeat="(key, poi_channel) in selection.elem.channels"
+            droppable drop="{{'DropToPoiChannel(\'' + selection.id + '\', \'' + key + '\');'}}">
+            <div draggable drag="{{'DragAsset(\'poi-channel\', \'' + key + '\')'}}">
               <span ng-include="'templates/drag_icon.html'"></span>
-              <div class="field-name">Object</div>
-              <div class="grp-border">
-                {{objects[poi_channel.object].name || poi_channel.object || 'Drop object'}}
-              </div>
-              <div ng-show="objects[poi_channel.object] !== undefined">
-                <div class="field-name">Object's latitude</div>
-                <input type="number" ng-model="poi_channel.latitude">
-                <div class="field-name">Object's longitude</div>
-                <input type="number" ng-model="poi_channel.longitude">
-                <div class="field-name">Object's altitude</div>
-                <input type="number" ng-model="poi_channel.altitude">
-                <div class="field-name">Object's scale</div>
-                <input type="number" ng-model="poi_channel.scale">
-              </div>
+              {{channels[poi_channel.uuid].name}}
             </div>
-          </uib-accordion-group>
-        </uib-accordion>
+          </li>
+        </ul>
+
+        <div class="field-name">Objects</div>
+        <ul class="content-array">
+          <li ng-repeat="(key, poi_object) in selection.elem.objects">
+            <div class="input-group">
+              <input type="text" ng-model="poi_object.name">
+              <span class="input-group-addon" ng-include="'templates/drag_icon.html'"
+                draggable drag="{{'DragAsset(\'poi-object\', \'' + key + '\')'}}"></span>
+            </div>
+          </li>
+        </ul>
 
         <div ng-include="'templates/delete_button.html'" ng-click="Delete()"></div>
 

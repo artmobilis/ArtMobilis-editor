@@ -140,6 +140,13 @@ angular.module('app')
       dataJourneyFactory.poiFactory.AddChannel(poi, id);
       DataManagerSvc.NotifyChange('pois', poi.uuid);
     }
+    else if (type === 'objects') {
+      var object = DataManagerSvc.GetData().objects[id];
+      if (object) {
+        dataJourneyFactory.poiFactory.AddObject(poi, id, object.name);
+        DataManagerSvc.NotifyChange('pois', poi.uuid);
+      }
+    }
   }
 
   function DropToContent(content, type, id) {
@@ -248,14 +255,16 @@ angular.module('app')
   }
 
   function DetachFromPoi(poi, type, id) {
-    if (type === 'poi-channel') {
+    if (type === 'poi-channel')
       poi.channels.splice(id, 1);
-      DataManagerSvc.NotifyChange('pois', poi.uuid);
-    }
-    else if (type === 'poi-channel-object') {
+    else if (type === 'poi-channel-object')
       delete poi.channels[id].object;
-      DataManagerSvc.NotifyChange('pois', poi.uuid);
-    }
+    else if (type === 'poi-object')
+      poi.objects.splice(id, 1);
+    else
+      return;
+
+    DataManagerSvc.NotifyChange('pois', poi.uuid);
   }
 
   function DetachFromChannel(channel, type, id) {
@@ -326,6 +335,13 @@ angular.module('app')
     $timeout();
   }
 
+  function UpdatePoiPositions() {
+    if (_selection.type === 'pois') {
+      dataJourneyFactory.poiFactory.UpdatePosition(_selection.elem);
+      DataManagerSvc.NotifyChange('pois', _selection.id);
+    }
+  }
+
   DataManagerSvc.AddListenerDataChange(OnDataChange);
 
   ProjectsManagerSvc.AddListenerChange(OnProjectChange);
@@ -350,6 +366,7 @@ angular.module('app')
   $scope.NewObject = NewObject;
   $scope.Delete = Delete;
   $scope.Detach = Detach;
+  $scope.UpdatePoiPositions = UpdatePoiPositions;
 
   $scope.$on('$destroy', function() {
     DataManagerSvc.RemoveListenerDataChange(OnDataChange);
