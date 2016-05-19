@@ -53,17 +53,6 @@
           <div ng-include="'templates/new_button.html'" ng-click="NewMarker()"></div>
         </uib-accordion-group>
 
-        <uib-accordion-group heading="Contents" is-open="">
-          <label class="btn btn-primary btn-list-item" ng-model="selection.model"
-          uib-btn-radio="'{{'contents_' + key}}'"
-          draggable drag="{{'DragAsset(\'contents\', \'' + key + '\')'}}"
-          ng-repeat="(key, value) in contents">
-            <span ng-include="'templates/drag_icon.html'"></span>
-            {{value.name || key}}
-          </label>
-          <div ng-include="'templates/new_button.html'" ng-click="NewContent()"></div>
-        </uib-accordion-group>
-
         <uib-accordion-group heading="Objects" is-open="">
           <label class="btn btn-primary btn-list-item" ng-model="selection.model"
           uib-btn-radio="'{{'objects_' + key}}'"
