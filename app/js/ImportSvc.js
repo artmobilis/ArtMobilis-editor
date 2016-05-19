@@ -1,7 +1,15 @@
 angular.module('app')
 
-.service('ImportSvc', ['DataManagerSvc', 'emptyAssetFactory', 'FileSystemSvc', 'ProjectsManagerSvc', 'dataJourneyFactory',
-  function(DataManagerSvc, emptyAssetFactory, FileSystemSvc, ProjectsManagerSvc, dataJourneyFactory) {
+.service('ImportSvc', [
+  'DataManagerSvc',
+  'FileSystemSvc',
+  'ProjectsManagerSvc',
+  'journeyType',
+  function(
+    DataManagerSvc,
+    FileSystemSvc,
+    ProjectsManagerSvc,
+    journeyType) {
 
     var _remote = require('remote');
     var _dialog = _remote.require('electron').dialog;
@@ -33,7 +41,7 @@ angular.module('app')
     function AddMarker(filename, path) {
       var name = GetName(filename);
 
-      var marker = emptyAssetFactory.CreateMarker();
+      var marker = new journeyType.Marker(undefined, name, 'img', path);
       marker.name = name;
       marker.type = 'img';
       marker.url = path;
@@ -223,7 +231,7 @@ angular.module('app')
       function ObjectImporter(path) {
         var objects = DataManagerSvc.GetData().objects;
 
-        dataJourneyFactory.objectFactory.Load(path).then(function(object) {
+        AMTHREE.LoadObject(path).then(function(object) {
           objects[object.uuid] = object;
           DataManagerSvc.NotifyChange('object', object.uuid);
         }, function(e) {

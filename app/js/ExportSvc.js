@@ -29,7 +29,7 @@
 
       var data_journey = DataManagerSvc.GetData();
 
-      var str = JSON.stringify(data_journey, undefined, 2);
+      var str = JSON.stringify(data_journey.ToJson(), undefined, 2);
 
       fs.write(fd, str, OnWrite);
     }

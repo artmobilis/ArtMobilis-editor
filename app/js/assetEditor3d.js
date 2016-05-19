@@ -2,12 +2,12 @@ angular.module('app')
 
 .directive('assetEditor3d', [
   'DataManagerSvc',
-  'dataJourneyFactory',
   'CoordinatesConverterSvc',
+  'journeyType',
   '$timeout',
   function(DataManagerSvc,
-    dataJourneyFactory,
     CoordinatesConverterSvc,
+    journeyType,
     $timeout) {
   return {
     restrict: 'AE',
@@ -22,12 +22,12 @@ angular.module('app')
       scope.GetSelectionName = function() {
         switch (_asset.type) {
           case 'channels':
-            if (_selection.index >= 0 && _asset.channel.contents[_selection.index])
-              return _asset.channel.contents[_selection.index].name;
+            if (_selection.object)
+              return _selection.object.name
           break;
           case 'pois':
-            if (_selection.index >= 0 && _asset.poi.objects[_selection.index])
-              return _asset.poi.objects[_selection.index].name;
+            if (_selection.object)
+              return _selection.object.name
           break;
         }
         return null;
@@ -61,8 +61,8 @@ angular.module('app')
 
 
       var _grid = new THREE.GridHelper( 100, 1 );
-      var _poi_bounds = dataJourneyFactory.poiFactory.CreateBoundsObject();
-      _poi_bounds.visible = false;
+      var _poi_bounds = new THREE.Object3D();
+      _scene.add(_poi_bounds);
 
       var _asset = {
         type: '',
@@ -81,8 +81,7 @@ angular.module('app')
 
       var _selection = {
         object: null,
-        box: new THREE.BoxHelper(),
-        index: -1
+        box: new THREE.BoxHelper()
       };
       _selection.box.material.depthTest = false;
       _selection.box.material.transparent = true;
@@ -163,19 +162,12 @@ angular.module('app')
           case 'channels':
           case 'pois':
 
-            while (object) {
-              if (typeof object.userData.index === 'number')
-                break;
-              object = object.parent;
-            }
-
             if ( _selection.object === object ) return;
 
             ResetSelection();
 
             if (object) {
               _selection.object = object;
-              _selection.index = _selection.object.userData.index;
               if (object.geometry !== undefined &&
                  object instanceof THREE.Sprite === false) {
 
@@ -195,7 +187,6 @@ angular.module('app')
           _transform_controls.detach();
         _selection.object = null;
         _selection.box.visible = false;
-        _selection.index = -1;
       }
 
       // object picking
@@ -349,7 +340,10 @@ angular.module('app')
       }
 
       function InitPoiObjects() {
-        _poi_bounds.scale.x = _poi_bounds.scale.z = _asset.poi.radius;
+        var o = _asset.poi.CreateBoundsObject();
+        o.position.x = 0;
+        o.position.z = 0;
+        _poi_bounds.add(o);
       }
 
       function InitScene() {
@@ -362,12 +356,10 @@ angular.module('app')
               var poi = data_journey.pois[_asset.id];
               _asset.poi = poi;
               if (poi) {
-                var objects = dataJourneyFactory.poiFactory.ToObject3D(poi, data_journey.objects);
+                var objects = poi.CreateScene(data_journey.objects);
                 objects.position.set(0, 0, 0);
                 _asset.poi_object = objects;
                 _scene.add(objects);
-
-                _poi_bounds.visible = true;
 
                 InitPoiObjects();
 
@@ -442,7 +434,7 @@ angular.module('app')
         _asset.marker     = null;
         _asset.poi        = null;
         _asset.poi_object = null;
-        _poi_bounds.visible = false;
+        _poi_bounds.remove.apply(_poi_bounds, _poi_bounds.children);
         NeedSave(false);
       }
 
@@ -476,36 +468,13 @@ angular.module('app')
         _asset.contents_object.remove.apply(_asset.contents_object, _asset.contents_object.children);
         _asset.selectables.length = 0;
 
-        var sphere = new THREE.Sphere();
+        var object = _asset.channel.BuildContents(DataManagerSvc.GetData().objects);
 
-        for(var len = _asset.channel.contents.length, index = 0; index < len; ++index) {
-          var contents_transform = _asset.channel.contents[index];
-          var contents_uuid = contents_transform.uuid;
-          var contents = DataManagerSvc.GetData().contents[contents_uuid];
-          if (!contents)
-            continue;
-          var object = DataManagerSvc.GetData().objects[contents.object];
-          if (!object)
-            continue;
-
-          object = object.clone();
-
-          object.userData = object.userData || {};
-          object.userData.index = index;
-
-
-          var pos = contents_transform.position;
-          var rot = contents_transform.rotation;
-          var scale = contents_transform.scale;
-
-          object.position.set(pos.x, pos.y, pos.z);
-          object.rotation.set(rot.x, rot.y, rot.z);
-          object.scale.set(scale.x, scale.y, scale.z);
-
-          GetBoundingSphere(object, sphere);
-
-          _asset.contents_object.add(object);
-          _asset.selectables.push(object);
+        while(object.children.length > 0) {
+          var child = object.children[0];
+          object.remove(child);
+          _asset.selectables.push(child);
+          _asset.contents_object.add(child);
         }
       }
 
@@ -539,8 +508,6 @@ angular.module('app')
 
       _scene.add(_grid);
 
-      _scene.add(_poi_bounds);
-
 
       scope.$watchGroup(['asset_type', 'asset_id'], function(new_values) {
         _asset.type = new_values[0];
@@ -564,25 +531,11 @@ angular.module('app')
       function Save() {
         DataManagerSvc.RemoveListenerDataChange(OnDataChange);
         if (_asset.type === 'channels' && _asset.channel) {
-          _asset.contents_object.children.forEach(function(object) {
-            if (object && typeof object.userData.index === 'number') {
-              var index = object.userData.index;
-              var content = _asset.channel.contents[index];
-              Point3DCopy(object.position, content.position);
-              Point3DCopy(object.rotation, content.rotation);
-              Point3DCopy(object.scale, content.scale);
-            }
-          });
+          journeyType.Channel.UpdateTransforms(_asset.contents_object);
           DataManagerSvc.NotifyChange(_asset.type, _asset.id);
         }
         if (_asset.type === 'pois' && _asset.poi) {
-          _asset.poi_object.children.forEach(function(object) {
-            var index = object.userData.index;
-            var elem = _asset.poi.objects[index];
-            Point3DCopy(object.position, elem.position);
-            Point3DCopy(object.rotation, elem.rotation);
-            Point3DCopy(object.scale, elem.scale);
-          });
+          journeyType.Poi.UpdateTransforms(_asset.poi_object);
           DataManagerSvc.NotifyChange(_asset.type, _asset.id);
         }
         DataManagerSvc.AddListenerDataChange(OnDataChange);
