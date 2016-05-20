@@ -55,6 +55,10 @@ angular.module('app')
 
       var _scene_helpers = new THREE.Scene();
 
+      var _light = new THREE.Object3D();
+      _light.add(new THREE.HemisphereLight(0xffffbb, 0x080820, 1));
+      _light.add(new THREE.AmbientLight(0x404040));
+
       var _helpers = {};
 
       var _running = false;
@@ -62,7 +66,6 @@ angular.module('app')
 
       var _grid = new THREE.GridHelper( 100, 1 );
       var _poi_bounds = new THREE.Object3D();
-      _scene.add(_poi_bounds);
 
       var _asset = {
         type: '',
@@ -428,6 +431,16 @@ angular.module('app')
         _asset.poi_object = null;
         _poi_bounds.remove.apply(_poi_bounds, _poi_bounds.children);
         NeedSave(false);
+
+        _scene.remove.apply(_scene, _scene.children);
+
+        _scene.add(_asset.contents_object);
+        _scene.add(_asset.marker_object);
+        _scene.add(_asset.container_object);
+        _scene.add(_poi_bounds);
+
+        _scene.add(_grid);
+        _scene.add(_light);
       }
 
       function SetMarker(marker) {
@@ -491,15 +504,7 @@ angular.module('app')
       }
 
 
-      _scene.add(new THREE.HemisphereLight(0xffffbb, 0x080820, 1));
-      _scene.add(new THREE.AmbientLight(0x404040));
-
-      _scene.add(_asset.contents_object);
-      _scene.add(_asset.marker_object);
-      _scene.add(_asset.container_object);
-
-      _scene.add(_grid);
-
+      ClearScene();
 
       scope.$watchGroup(['asset_type', 'asset_id'], function(new_values) {
         _asset.type = new_values[0];
