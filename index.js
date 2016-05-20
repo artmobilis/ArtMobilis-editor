@@ -9,7 +9,9 @@ app.on('ready', function() {
     'web-preferences': {
       'web-security': false,
       'webgl': true
-    }
+    },
+    center: true,
+    icon: 'app/img/logo.png'
   });
   mainWindow.loadUrl('file://' + __dirname + '/app/index.html');
   // mainWindow.loadUrl('http://html5test.com/'); // to see what is available

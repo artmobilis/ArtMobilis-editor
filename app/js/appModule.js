@@ -3,7 +3,6 @@ angular.module('app', [
   'ui.bootstrap',
   'ngAnimate',
   'data',
-  'dataLoading',
   'journey',
   'uuid4'
   ]

@@ -1,7 +1,15 @@
 angular.module('app')
 
-.service('ImportSvc', ['DataManagerSvc', 'emptyAssetFactory', 'FileSystemSvc', 'ProjectsManagerSvc', 'dataJourneyFactory',
-  function(DataManagerSvc, emptyAssetFactory, FileSystemSvc, ProjectsManagerSvc, dataJourneyFactory) {
+.service('ImportSvc', [
+  'DataManagerSvc',
+  'FileSystemSvc',
+  'ProjectsManagerSvc',
+  'journeyType',
+  function(
+    DataManagerSvc,
+    FileSystemSvc,
+    ProjectsManagerSvc,
+    journeyType) {
 
     var _remote = require('remote');
     var _dialog = _remote.require('electron').dialog;
@@ -33,7 +41,7 @@ angular.module('app')
     function AddMarker(filename, path) {
       var name = GetName(filename);
 
-      var marker = emptyAssetFactory.CreateMarker();
+      var marker = new journeyType.Marker(undefined, name, 'img', path);
       marker.name = name;
       marker.type = 'img';
       marker.url = path;
@@ -76,6 +84,7 @@ angular.module('app')
         });
 
         if (typeof files !== 'undefined') {
+          ProjectsManagerSvc.CreateDirectories();
           for (var i = 0, c = files.length; i < c; ++i) {
             (new MarkersImporter(files[i]));
           }
@@ -94,7 +103,7 @@ angular.module('app')
       DataManagerSvc.NotifyChange('object', object.uuid);
     }
 
-    function AddPlaneJpg(path) {
+    function AddPlaneImage(path) {
       var image = new AMTHREE.Image(undefined, path);
       var texture = new AMTHREE.ImageTexture(image);
 
@@ -125,38 +134,6 @@ angular.module('app')
       DataManagerSvc.NotifyChange('object', object.uuid);
     }
 
-    function ImportImageJpg() {
-      var files = _dialog.showOpenDialog( {
-        properties: ['openFile'],
-        filters: [
-          {
-            name: 'JPEG image',
-            extensions: ['jpg', 'jpeg']
-          }
-        ]
-      });
-
-      if (typeof files !== 'undefined' && files.length === 1) {
-        AddPlaneJpg(files[0]);
-      }
-    }
-
-    function ImportImageGif() {
-      var files = _dialog.showOpenDialog( {
-        properties: ['openFile'],
-        filters: [
-          {
-            name: 'GIF image',
-            extensions: ['gif']
-          }
-        ]
-      });
-
-      if (typeof files !== 'undefined' && files.length === 1) {
-        AddPlaneGif(files[0]);
-      }
-    }
-
     function ImportFilesAsPlanes() {
       var files = _dialog.showOpenDialog( {
         title: 'Import objects',
@@ -164,12 +141,13 @@ angular.module('app')
         filters: [
           {
             name: 'Image, video, sound',
-            extensions: ['jpg', 'jpeg', 'gif', 'mp4', 'mp3']
+            extensions: ['jpg', 'jpeg', 'png', 'gif', 'mp4', 'mp3']
           }
         ]
       })
 
       if (typeof files !== 'undefined') {
+        ProjectsManagerSvc.CreateDirectories();
         for (var i = 0, c = files.length; i < c; ++i) {
 
           function PlaneImporter(path) {
@@ -180,13 +158,14 @@ angular.module('app')
             switch (extension) {
               case 'jpg':
               case 'jpeg':
+              case 'png':
               var local_path = AMTHREE.IMAGE_PATH + filename;
               var new_path = root + '/' + local_path;
               if (FileSystemSvc.FileExists(new_path))
-                AddPlaneJpg(new_path);
+                AddPlaneImage(new_path);
               else {
                 FileSystemSvc.CopyFile(path, new_path).then(function() {
-                  AddPlaneJpg(new_path);
+                  AddPlaneImage(new_path);
                 }).catch(function(err) {
                   console.warn(err);
                 });
@@ -252,7 +231,7 @@ angular.module('app')
       function ObjectImporter(path) {
         var objects = DataManagerSvc.GetData().objects;
 
-        dataJourneyFactory.objectFactory.Load(path).then(function(object) {
+        AMTHREE.LoadObject(path).then(function(object) {
           objects[object.uuid] = object;
           DataManagerSvc.NotifyChange('object', object.uuid);
         }, function(e) {
@@ -328,6 +307,7 @@ angular.module('app')
         });
 
         if (typeof files !== 'undefined') {
+          ProjectsManagerSvc.CreateDirectories();
           for (var i = 0, c = files.length; i < c; ++i) {
             var path = files[i];
 
@@ -384,8 +364,6 @@ angular.module('app')
     }
 
     this.ImportMarkers = ImportMarkers;
-    this.ImportImageJpg = ImportImageJpg;
-    this.ImportImageGif = ImportImageGif;
     this.ImportFilesAsPlanes = ImportFilesAsPlanes;
     this.ImportObjects3D = ImportObjects3D;
     this.Open = Open;

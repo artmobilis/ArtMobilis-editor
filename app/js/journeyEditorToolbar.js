@@ -2,7 +2,6 @@ angular.module('app')
 
 .directive('journeyEditorToolbar', [
   'DataManagerSvc',
-  'dataJourneyFactory',
   'ImportSvc',
   'ExportSvc',
   'ProjectsManagerSvc',
@@ -10,7 +9,6 @@ angular.module('app')
   'JourneySceneSvc',
   '$timeout',
   function(DataManagerSvc,
-    dataJourneyFactory,
     ImportSvc,
     ExportSvc,
     ProjectsManagerSvc,

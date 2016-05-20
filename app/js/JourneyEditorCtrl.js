@@ -4,14 +4,12 @@ angular.module('app')
   '$scope',
   '$timeout',
   'DataManagerSvc',
-  'dataJourneyFactory',
-  'emptyAssetFactory',
+  'journeyType',
   'ProjectsManagerSvc',
   function($scope,
     $timeout,
     DataManagerSvc,
-    dataJourneyFactory,
-    emptyAssetFactory,
+    journeyType,
     ProjectsManagerSvc) {
 
   var _selection = {
@@ -65,7 +63,6 @@ angular.module('app')
     $scope.pois      = journey_data.pois;
     $scope.channels  = journey_data.channels;
     $scope.markers   = journey_data.markers;
-    $scope.contents  = journey_data.contents;
     $scope.objects   = journey_data.objects;
   }
 
@@ -107,15 +104,19 @@ angular.module('app')
 
   function DropToChannel(channel, type, id) {
     if (type === 'markers') {
-      channel.marker = id;
-      $timeout();
+      if (channel.marker !== id) {
+        channel.marker = id;
+        DataManagerSvc.NotifyChange('channels', channel.uuid);
+        $timeout();
+      }
     }
-    else if (type === 'contents') {
-      dataJourneyFactory.channelFactory.AddContent(
-        channel,
-        DataManagerSvc.GetData().contents[id]
-        );
-      $timeout();
+    else if (type === 'objects') {
+      var object = DataManagerSvc.GetData().objects[id];
+      if (object) {
+        channel.AddContent(new journeyType.ObjectTransform(id, object.name));
+        DataManagerSvc.NotifyChange('channels', channel.uuid);
+        $timeout();
+      }
     }
     else
       return;
@@ -125,28 +126,31 @@ angular.module('app')
 
   function DropToJourney(journey, type, id) {
     if (type === 'pois') {
-      dataJourneyFactory.journeyFactory.AddPoi(journey, id);
-      $timeout();
+      if (journey.AddPoi(id)) {
+        DataManagerSvc.NotifyChange('journey');
+        $timeout();
+      }
     }
   }
 
   function DropToPoi(poi, type, id) {
     if (type === 'channels') {
-      dataJourneyFactory.poiFactory.AddChannel(poi, id);
+      if (poi.AddChannel(id))
+        DataManagerSvc.NotifyChange('pois', poi.uuid);
     }
-  }
-
-  function DropToContent(content, type, id) {
-    if (type === 'objects') {
-      content.object = id;
+    else if (type === 'objects') {
+      var object = DataManagerSvc.GetData().objects[id];
+      if (object) {
+        if (poi.AddObject(new journeyType.ObjectTransform(id, object.name)))
+          DataManagerSvc.NotifyChange('pois', poi.uuid);
+      }
     }
   }
 
   var drop_fctns = {
     journey: DropToJourney,
     pois: DropToPoi,
-    channels: DropToChannel,
-    contents: DropToContent,
+    channels: DropToChannel
   }
 
   function Drop(event) {
@@ -157,52 +161,24 @@ angular.module('app')
     var fun = drop_fctns[_selection.type];
     if (typeof fun !== 'undefined') {
       fun(_selection.elem, slice.type, slice.id);
-      $timeout();
     }
-  }
-
-  function DropToPoiChannel(poi_id, channel_index) {
-    var poi = DataManagerSvc.GetData().pois[poi_id];
-    var channel_poi = poi.channels[channel_index];
-    if (channel_poi) {
-      return function(event) {
-        event.preventDefault();
-        var data = event.dataTransfer.getData('Text');
-        var slice = SliceAssetId(data);
-        if (slice.type === 'objects') {
-          channel_poi.object = slice.id;
-        }
-
-        $timeout();
-      };
-    }
-    else
-      return function() {};
   }
 
   function NewPoi() {
-    var elem = emptyAssetFactory.CreatePoi();
+    var elem = new journeyType.Poi();
+    elem.name = 'unnamed poi';
     DataManagerSvc.GetData().pois[elem.uuid] = elem;
   }
 
   function NewChannel() {
-    var elem = emptyAssetFactory.CreateChannel();
+    var elem = new journeyType.Channel();
+    elem.name = 'unnamed channel';
     DataManagerSvc.GetData().channels[elem.uuid] = elem;
   }
 
   function NewMarker() {
-    var elem = emptyAssetFactory.CreateMarker();
+    var elem = new journeyType.Marker();
     DataManagerSvc.GetData().markers[elem.uuid] = elem;
-  }
-
-  function NewContent() {
-    var elem = emptyAssetFactory.CreateContent();
-    DataManagerSvc.GetData().contents[elem.uuid] = elem;
-  }
-
-  function NewObject() {
-    var elem = emptyAssetFactory.CreateObject();
-    DataManagerSvc.GetData().objects[elem.uuid] = elem;
   }
 
   function SetSelection(type, id) {
@@ -229,6 +205,7 @@ angular.module('app')
     }
     if (found) {
       delete container[_selection.id];
+      DataManagerSvc.NotifyChange(_selection.type, _selection.id);
       if (next)
         SetSelection(_selection.type, next);
       else if (previous)
@@ -241,20 +218,26 @@ angular.module('app')
   }
 
   function DetachFromPoi(poi, type, id) {
-    if (type === 'poi-channel') {
+    if (type === 'poi-channel')
       poi.channels.splice(id, 1);
-    }
-    else if (type === 'poi-channel-object') {
+    else if (type === 'poi-channel-object')
       delete poi.channels[id].object;
-    }
+    else if (type === 'poi-object')
+      poi.objects.splice(id, 1);
+    else
+      return;
+
+    DataManagerSvc.NotifyChange('pois', poi.uuid);
   }
 
   function DetachFromChannel(channel, type, id) {
     if (type === 'channel-content') {
       channel.contents.splice(id, 1);
+      DataManagerSvc.NotifyChange('channels', channel.uuid);
     }
     else if (type === 'channel-marker') {
       channel.marker = null;
+      DataManagerSvc.NotifyChange('channels', channel.uuid);
     }
     else
       return;
@@ -265,20 +248,14 @@ angular.module('app')
   function DetachFromJourney(journey, type, id) {
     if (type === 'journey-poi') {
       journey.pois.splice(id, 1);
-    }
-  }
-
-  function DetachFromContent(content, type, id) {
-    if (type === 'content-object') {
-      content.object = null;
+      DataManagerSvc.NotifyChange('journey');
     }
   }
 
   var detach_fctns = {
     journey: DetachFromJourney,
     pois: DetachFromPoi,
-    channels: DetachFromChannel,
-    contents: DetachFromContent
+    channels: DetachFromChannel
   }
 
   function Detach(event) {
@@ -313,6 +290,12 @@ angular.module('app')
     $timeout();
   }
 
+  function UpdatePoiPositions() {
+    if (_selection.type === 'pois') {
+      DataManagerSvc.NotifyChange('pois', _selection.id);
+    }
+  }
+
   DataManagerSvc.AddListenerDataChange(OnDataChange);
 
   ProjectsManagerSvc.AddListenerChange(OnProjectChange);
@@ -329,14 +312,12 @@ angular.module('app')
   $scope.GetJourney = GetJourney;
   $scope.DragAsset = DragAsset;
   $scope.Drop = Drop;
-  $scope.DropToPoiChannel = DropToPoiChannel;
   $scope.NewPoi = NewPoi;
   $scope.NewChannel = NewChannel;
   $scope.NewMarker = NewMarker;
-  $scope.NewContent = NewContent;
-  $scope.NewObject = NewObject;
   $scope.Delete = Delete;
   $scope.Detach = Detach;
+  $scope.UpdatePoiPositions = UpdatePoiPositions;
 
   $scope.$on('$destroy', function() {
     DataManagerSvc.RemoveListenerDataChange(OnDataChange);
