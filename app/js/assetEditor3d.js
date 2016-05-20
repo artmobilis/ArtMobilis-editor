@@ -347,11 +347,11 @@ angular.module('app')
       }
 
       function InitScene() {
-        ClearScene();
+        DataManagerSvc.GetLoadPromise().then(function() {
+          ClearScene();
 
-        switch(_asset.type) {
-          case 'pois':
-            DataManagerSvc.GetLoadPromise().then(function() {
+          switch(_asset.type) {
+            case 'pois':
               var data_journey = DataManagerSvc.GetData();
               var poi = data_journey.pois[_asset.id];
               _asset.poi = poi;
@@ -370,21 +370,17 @@ angular.module('app')
                 AMTHREE.PlayAnimatedTextures(_scene);
                 AMTHREE.PlaySounds(_scene);
               }
-            });
-          break;
+            break;
 
-          case 'channels':
-            DataManagerSvc.GetLoadPromise().then(function() {
+            case 'channels':
               _asset.channel = DataManagerSvc.GetData().channels[_asset.id];
               if (!_asset.channel)
                 return;
 
               SetChannel();
-            });
-          break;
+            break;
 
-          case 'contents':
-            DataManagerSvc.GetLoadPromise().then(function() {
+            case 'contents':
               _asset.content = DataManagerSvc.GetData().contents[_asset.id];
               if (_asset.content) {
                 var object = DataManagerSvc.GetData().objects[_asset.content.object];
@@ -394,29 +390,25 @@ angular.module('app')
                   AMTHREE.PlaySounds(_scene);
                 }
               }
-            });
-          break;
+            break;
 
-          case 'objects':
-            DataManagerSvc.GetLoadPromise().then(function() {
+            case 'objects':
               _asset.object = DataManagerSvc.GetData().objects[_asset.id];
               if (_asset.object) {
                 _asset.container_object.add(_asset.object.clone());
                 AMTHREE.PlayAnimatedTextures(_scene);
                 AMTHREE.PlaySounds(_scene);
               }
-            });
-          break;
+            break;
 
-          case 'markers':
-            DataManagerSvc.GetLoadPromise().then(function() {
+            case 'markers':
               _asset.marker = DataManagerSvc.GetData().markers[_asset.id];
               if (_asset.marker) {
                 SetMarker(_asset.marker);
               }
-            });
-          break;
-        }
+            break;
+          }
+        });
       }
 
       function ClearScene() {
