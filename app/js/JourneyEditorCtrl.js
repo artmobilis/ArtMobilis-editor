@@ -135,7 +135,7 @@ angular.module('app')
 
   function DropToPoi(poi, type, id) {
     if (type === 'channels') {
-      if (poi.AddChannel(id))
+      if (poi.AddChannel(new journeyType.PoiChannel(id)))
         DataManagerSvc.NotifyChange('pois', poi.uuid);
     }
     else if (type === 'objects') {
@@ -151,7 +151,7 @@ angular.module('app')
     journey: DropToJourney,
     pois: DropToPoi,
     channels: DropToChannel
-  }
+  };
 
   function Drop(event) {
     event.preventDefault();

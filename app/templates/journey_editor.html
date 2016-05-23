@@ -116,8 +116,7 @@
 
         <div class="field-name">Channels</div>
         <ul class="grp-border">
-          <li ng-repeat="(key, poi_channel) in selection.elem.channels track by $index"
-            droppable drop="{{'DropToPoiChannel(\'' + selection.id + '\', \'' + key + '\');'}}">
+          <li ng-repeat="(key, poi_channel) in selection.elem.channels track by $index">
             <div draggable drag="{{'DragAsset(\'poi-channel\', \'' + key + '\')'}}">
               <span ng-include="'templates/drag_icon.html'"></span>
               {{channels[poi_channel.uuid].name}}
@@ -179,21 +178,6 @@
         </div>
         <div class="field-name">Url</div>
         <input type="text" ng-model="selection.elem.url">
-        <div ng-include="'templates/delete_button.html'" ng-click="Delete()"></div>
-      </div>
-
-      <div id="edit_content" ng-show="selection.type === 'contents'"
-      droppable drop="Drop">
-        <h3>Edit content</h3>
-        <div ng-include="'templates/trash_area.html'" droppable drop="Detach"></div>
-        <div class="field-name">Name</div>
-        <input type="text" ng-model="selection.elem.name">
-        <div class="field-name">Object</div>
-        <div class="grp-border" 
-        draggable drag="{{'DragAsset(\'content-object\', \'\')'}}">
-          {{objects[selection.elem.object].name || objects[selection.elem.object].uuid}}
-          <span ng-include="'templates/drag_icon.html'"></span>
-        </div>
         <div ng-include="'templates/delete_button.html'" ng-click="Delete()"></div>
       </div>
 
